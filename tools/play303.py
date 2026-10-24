@@ -102,8 +102,14 @@ async def main():
       if not q: log('no piece',n,[(q['n'],round(q['x']),round(q['y']),q['sock']) for q in await pcs()]);FAIL.append(f'no piece {n}');return
       s=(await ev("__T.socks()"))[si];x=(s['x0']+s['x1'])/2+dx;y=s['y']
       await drag(q['x'],q['y'],x,y)
-    async def fuse(na,nb):
+    async def fuse(na,nb,tries=2):
       await settle(300)
+      for _ in range(6):
+        bq0=await piece(nb)
+        if not bq0: await W8(500);continue
+        E0=await ev(f"__T.ends({bq0['id']})")
+        if abs(E0[0]['y']-E0[1]['y'])<15 and not bq0['sock']: break
+        await W8(500);await settle(300)
       a=await piece(na);bq=await piece(nb)
       if not a or not bq: log('fuse miss',na,nb,[(q['n'],round(q['x']),round(q['y']),q['sock']) for q in await pcs()]);FAIL.append(f'fuse {na}+{nb}');return
       zg=await ev("LV.zeroG");vr=min(await ev('vis().x0+vis().w-40'),1100 if not zg else 1200);vl=max(await ev('vis().x0+40'),60)
@@ -129,6 +135,7 @@ async def main():
       _,tx,ty=max(c)
       log('  pre-fuse',await ev('LV.pieces.map(p=>[p.n,+(p.fuseCool-T).toFixed(2),p.noFuse||0,p.hist&&p.hist.sib||0,p.id])'),a['id'],bq['id'],round(tx),round(ty))
       await drag(a['x'],a['y'],tx,ty,hold=450,lift='always');await settle(500);FC[0]+=1;await shot(f'fuse_{FC[0]}');log('  fused?',[(q['n'],round(q['x']),round(q['y'])) for q in await pcs()])
+      if tries>1 and not await piece(na+nb) and await piece(na) and await piece(nb): log('  retry fuse');return await fuse(na,nb,tries-1)
     async def gcut(b):
       g=(await ev("__T.guards()"))[0];y=g['gy']-b*BS;await swipe(g['x']-90,y-4,g['x']+90,y+4)
     async def gundo():
