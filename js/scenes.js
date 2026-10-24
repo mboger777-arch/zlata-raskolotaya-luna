@@ -95,7 +95,7 @@ function csFx(s,c,st){const v=vis();
  if(s.fx==='lanterns'){if(Math.random()<.08)burst(rnd(v.x0,v.x0+v.w),v.y0+v.h,6,'conf')}
  if(s.fx==='ribbon'){X.save();X.globalCompositeOperation='lighter';X.strokeStyle='rgba(180,220,255,.6)';X.lineWidth=6*c.s;X.beginPath();const ax=c.x0+820*c.s,ay=c.y0+380*c.s,bx=c.x0+470*c.s,by=c.y0+400*c.s;X.moveTo(ax,ay);X.quadraticCurveTo((ax+bx)/2,ay-120*c.s+Math.sin(T*3)*20,bx,by);X.stroke();X.restore()}}
 // ---- карта ----
-const MAPN=[[230,575],[525,470],[650,250],[930,530],[980,250],[1110,150]];const BAKE=[160,520];
+const MAPN=[[230,575],[525,470],[650,250],[930,530],[980,250],[1110,150]];const BAKE=[100,420];
 const isOpen=i=>i===0||!!SV.done[i-1];
 SC.map={enter(){music('title');run(async()=>{await wait(350);if(NSH()>=5&&!SV.bakeSaid){SV.bakeSaid=1;save();await say('m_bonus')}else if(SV.done[4]&&!SV.done[5])await say('m_boss');else await say('m1')})},
  draw(){bgCover('map');let cur=SV.done.slice(0,6).findIndex(d=>!d);if(cur<0)cur=5;
