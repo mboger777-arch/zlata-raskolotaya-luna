@@ -25,9 +25,9 @@
 - [ ] Реплики → голоса + ASR + проверка ударений
   - [x] tools/lines.py (96 реплик) → tools/lines.json, js/lines.js
   - [x] voicegen.py: REF zlata/pazl/luna/rask/narr, префикс z303; запуск: cd /workspace/lesson303 && nice -n 15 /home/box/tts/qw/bin/python tools/voicegen.py > /tmp/vg303.log (после вырезки!)
-  - [x] генерация 96/96 (VOICEDONE) · [~] ударения: scan (tools/stress.py, RISK под урок) → перегенерированы и заменены (tools/voicepick.py): g_cut, c5_s, h_3, s5, i2, i3; ждут: h_t (Расколу), c4_push (отсеки) · [x] voicecheck (tools/voicecheck.py: intro/fall/heart/whole + старт ур.1 со звуком, клики во время речи: 26 реплик, CUT 0, OVERLAP 0)
+  - [x] генерация 96/96 (VOICEDONE) · [~] ударения: scan (tools/stress.py, RISK под урок) → перегенерированы и заменены (tools/voicepick.py): g_cut, c5_s, h_3, s5, i2, i3; c4_push; ждёт: h_t (Расколу). i2 «мечом», s4/w_4 «сердечко» — проверены whisper-medium: произнесено верно, не трогаем · [x] voicecheck (tools/voicecheck.py: intro/fall/heart/whole + старт ур.1 со звуком, клики во время речи: 26 реплик, CUT 0, OVERLAP 0)
   - ASR: 96/96, расхождения только цифры/икс и «страш» (норма оглушения); подозрительные: i2 «мечом→мячом», s4/w_4 «сердечко→сердечка» — проверка ударений идёт (запуск: nice -n 15 /home/box/tts/qw/bin/python tools/stress.py scan)
-- [ ] tools/play303.py — полный проход реальными жестами (пишется)
+- [x] tools/play303.py — полный проход реальными жестами (все задания: ошибка+исправление, осколки, босс, сердце, пекарня, аудит, fps)
 - [ ] Тесты 844x390, 667x375, 932x430 (ошибка+исправление на каждом задании, аудит, fps, 0 ошибок); voicecheck
 - [ ] Публикация ?v=, проверка живого URL
 
