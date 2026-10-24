@@ -67,7 +67,7 @@ const CS={
   {bg:'cs_whole',k:'w_4',z:[1.5,1.65],f:[[1000,470],[1020,480]],fx:'lanterns'},
   {bg:'cs_whole',k:'w_5',z:[1.15,1],f:[[800,400],[640,360]],fx:'lanterns'}],
   next(){go('fin')}}};
-SC.cs={enter(id){const c=CS[id];const st=this.st={id,c,i:0,t0:T,crack:-1};music(c.music||'cs');if(id==='whole'||id==='heart')G.kind=true;
+SC.cs={enter(id){const c=CS[id];const st=this.st={id,c,i:0,t0:T,crack:-1,dur:3};music(c.music||'cs');if(id==='whole'||id==='heart')G.kind=true;
   run(async()=>{await wait(350);for(let i=0;i<c.shots.length;i++){const s=c.shots[i];st.i=i;st.t0=T;st.dur=lineDur(s.k);if(s.fx==='crack')setTimeout(()=>{if(this.st===st){st.crack=T;SFX.crack();SFX.quake&&SFX.quake();addShake(1);FX.flash=.8;FX.flashC='#e8d0ff';vib([60,40,120])}},(s.at||1)*1000);
     if(s.fx==='evil'&&i>0)SFX.roar&&SFX.roar();await say(s.k);await wait(350)}c.next()})},
  draw(){const st=this.st,s=st.c.shots[st.i];const k=clamp((T-st.t0)/Math.max(2,st.dur),0,1),e=ease(k);const sh=FX.shake*14;FX.shake=Math.max(0,FX.shake-DT*1.2);
@@ -107,9 +107,9 @@ SC.map={enter(){music('title');run(async()=>{await wait(350);if(NSH()>=5&&!SV.ba
    const pw=i===5?230:210;plate(LVNAME[i],clamp(x,safeL()+pw/2+6,safeR()-pw/2-6),clamp(ny+d/2+26,0,safeB()-26),pw,44,28,{id:'mapname'})});
   {const [x,y]=bgXY(...MAPN[cur]);const side=x>900?-1:1;hero('z_idle',x+side*88,y+24,140,{seed:2});hero('p_idle',x+side*140,y+24,70,{seed:7,ph:1})}
   if(NSH()>=5){const [x,y]=bgXY(...BAKE);UI.push({id:'bake',x,y:y-40,w:150,h:150,fn:()=>{SFX.click();go('play',6)}});const k=1+Math.sin(T*4)*.05;spr('pie',x,y-50,110*k,{});plate('Пекарня',x,y+22,160,42,28,{id:'bakebtn'})}
-  const x0=safeR()-230,y0=safeT()+40;X.fillStyle='rgba(30,22,64,.85)';rr(x0-32,y0-32,262,64,32);X.fill();X.strokeStyle='#d8c2ff';X.lineWidth=3;X.stroke();
+  const x0=safeR()-230,y0=safeB()-40;X.fillStyle='rgba(30,22,64,.85)';rr(x0-32,y0-32,262,64,32);X.fill();X.strokeStyle='#d8c2ff';X.lineWidth=3;X.stroke();
   for(let i=0;i<5;i++)spr('shard',x0+i*49,y0,SV.shards[i]?50:36,{a:SV.shards[i]?1:.35,rot:SV.shards[i]?Math.sin(T+i)*.3:0});
-  if(SV.fin)spr('medal',safeR()-110,y0+82,80,{rot:Math.sin(T*1.5)*.08});
+  if(SV.fin)spr('medal',safeR()-40,y0-80,80,{rot:Math.sin(T*1.5)*.08});
   drawTalk()},
  ui(){roundBtn('home',safeL()+44,safeT()+44,80,r=>houseIcon(r),()=>{SFX.click();go('title')})}};
 function mapNode(id,x,y,d,t,open,fn,pulse){UI.push({id,x,y,w:d,h:d,fn});const k=1+(pulse?Math.sin(T*5)*.06:0);X.save();X.translate(x,y);X.scale(k,k);
@@ -209,5 +209,6 @@ window.__T={
  pieces(){return LV?LV.pieces.map(p=>{const q=pos(p);return{id:p.id,n:p.n,x:q.x,y:q.y,a:q.a,locked:p.locked,sock:!!p.sock,held:p.held!=null,guard:p.hist&&p.hist.guard}}):[]},
  socks(){return LV?LV.sockets.map(s=>{const r=sockRect(s);return Object.assign({cx:s.cx,cy:s.cy,n:s.n,fill:!!s.fill,need:s.need,temp:!!s.temp},r)}):[]},
  guards(){return LV?LV.guards.map(g=>({id:g.id,x:g.x,gy:g.gy,n:g.n,b:g.b,done:!!g.done})):[]},
+ ends(id){const p=LV.pieces.find(p=>p.id===id);return p?ends(p):null},
  css(x,y){return G.pg(x,y)},lv(){return LV},vis(){return vis()}};
 go('load');
