@@ -191,7 +191,18 @@ function drawBar(x,y,a,n,cols,o){o=o||{};const L=n*BS,h=BS*BH;X.save();X.transla
  X.strokeStyle='rgba(230,235,255,.35)';X.lineWidth=2;for(let i=1;i<n;i++){const cx=-L/2+i*BS;X.beginPath();X.moveTo(cx,-h/2+5);X.lineTo(cx,h/2-5);X.stroke()}
  if(!pie&&!o.noGlow){X.globalCompositeOperation='lighter';for(let i=0;i<n;i++){const cx=-L/2+BS/2+i*BS,hue=cols[i];const g=X.createRadialGradient(cx,0,0,cx,0,BS*.7);g.addColorStop(0,`hsla(${hue},100%,70%,${o.flash?.55:.28})`);g.addColorStop(1,`hsla(${hue},100%,60%,0)`);X.fillStyle=g;X.fillRect(cx-BS*.7,-BS*.7,BS*1.4,BS*1.4)}X.globalCompositeOperation='source-over'}
  X.restore()}
-function numTag(v,x,y,size,o){o=o||{};const s=size||52;txt(String(v),x,y,s,o.col||'#fff',{f:NUM,st:o.st||'#1a0f3a',lw:Math.max(6,s*.2),id:o.id||'num',kind:'num'})}
+let TAGQ=null;
+function numTag(v,x,y,size,o){o=o||{};if(TAGQ){TAGQ.push({v,x,y,size,o});return}numTag0(v,x,y,size,o)}
+// подписи-числа никогда не перекрываются: раздвигаем по оси меньшего перекрытия, «якорные» (у гнёзд/стражей) не двигаем
+function flushTags(){const q=TAGQ;TAGQ=null;if(!q)return;const mv=t=>t.o.id==='pnum'||t.o.id==='gnum';
+ for(const t of q){const s=t.size||52;t.w=s*.6*String(t.v).length+s*.35;t.h=s*.95}
+ for(let it=0;it<8;it++){let any=false;for(let i=0;i<q.length;i++)for(let j=i+1;j<q.length;j++){const a=q[i],b=q[j];
+   const ox=(a.w+b.w)/2+4-Math.abs(a.x-b.x),oy=(a.h+b.h)/2+2-Math.abs(a.y-b.y);if(ox<=0||oy<=0)continue;any=true;
+   const ma=mv(a),mb=mv(b);if(!ma&&!mb)continue;const wa=ma&&mb?.5:ma?1:0,wb=1-wa;
+   if(ox<oy){const d=a.x<b.x||(a.x===b.x&&i<j)?-1:1;a.x+=d*ox*wa;b.x-=d*ox*wb}else{const d=a.y<b.y||(a.y===b.y&&i<j)?-1:1;a.y+=d*oy*wa;b.y-=d*oy*wb}}
+  if(!any)break}
+ for(const t of q)numTag0(t.v,t.x,t.y,t.size,t.o)}
+function numTag0(v,x,y,size,o){o=o||{};const s=size||52;txt(String(v),x,y,s,o.col||'#fff',{f:NUM,st:o.st||'#1a0f3a',lw:Math.max(6,s*.2),id:o.id||'num',kind:'num'})}
 function drawPieces(){const L=LV;
  for(const p of L.pieces){if(p.sock&&!p.locked)continue;let q=pos(p);let x=q.x,y=q.y,a=q.a;
   if(p.locked&&p.lockT!=null){const k=ease(clamp((T-p.lockT)/.25,0,1));x=lerp(p.sx,p.x,k);y=lerp(p.sy,p.y,k);a=lerp(p.sa,0,k)}

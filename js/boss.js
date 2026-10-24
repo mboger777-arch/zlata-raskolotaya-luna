@@ -1,17 +1,17 @@
 'use strict';
 // ===== Башня Раскола: босс в 3 фазы + «сердце» (возвращение Раскола в Луну) =====
 function rDraw(L){const r=L.rk;if(!r)return;const v=vis();const hit=r.hit&&T-r.hit<.5;const x=Math.min(r.x,safeR()-r.h*.22)+(hit?Math.sin(T*60)*6:0);
- const n=r.kneel?'r_kneel':hit?'r_kneel':(r.thr&&T-r.thr<.6)?'r_attack':(G.kind?'r_kind':'r_proud');const h=n==='r_kneel'?r.h*.72:r.h;
+ const n=r.kneel?'r_kneel':hit?'r_kneel':(r.thr&&T-r.thr<.6)?'r_attack':(G.kind?'r_kind':'r_proud');const h=n==='r_kneel'?r.h*.8:r.h;
  X.save();X.globalCompositeOperation='lighter';const g=X.createRadialGradient(x,L.gy-r.h*.5,10,x,L.gy-r.h*.5,r.h*.7);g.addColorStop(0,G.kind?'rgba(255,220,140,.35)':'rgba(190,90,255,.35)');g.addColorStop(1,'rgba(120,40,200,0)');X.fillStyle=g;X.fillRect(x-r.h,L.gy-r.h*1.3,r.h*2,r.h*1.4);X.restore();
  hero(n,x,L.gy,h,{flip:n==='r_kneel',ph:2});r.cx=x;
  // сердечко Пазлика в броне
  if(!r.noHeart){const hx=x+(n==='r_kneel'?-h*.05:-r.h*.02),hy=L.gy-h*(n==='r_kneel'?.62:.66);X.save();X.globalCompositeOperation='lighter';X.fillStyle=`rgba(255,200,90,${.35+.25*Math.sin(T*4)})`;X.beginPath();X.arc(hx,hy,26,0,7);X.fill();X.restore()}
  // полоска «брони»
- if(L.hp!=null){const w=200,y=L.gy-r.h-40;for(let i=0;i<L.hpMax;i++){const on=i<L.hp;X.fillStyle=on?'#c070ff':'rgba(255,255,255,.25)';X.strokeStyle='#2a1040';X.lineWidth=3;rr(x-w/2+i*(w/L.hpMax)+3,y,w/L.hpMax-6,16,8);X.fill();X.stroke()}}}
+ if(L.hp!=null){const w=200,y=Math.max(L.gy-r.h-30,safeT()+96);for(let i=0;i<L.hpMax;i++){const on=i<L.hp;X.fillStyle=on?'#c070ff':'rgba(255,255,255,.25)';X.strokeStyle='#2a1040';X.lineWidth=3;rr(x-w/2+i*(w/L.hpMax)+3,y,w/L.hpMax-6,16,8);X.fill();X.stroke()}}}
 async function rHit(L,k){L.hp=Math.max(0,L.hp-1);L.rk.hit=T;SFX.crack();addShake(.8);FX.flash=.5;FX.flashC='#ffd8ff';vib([40,40,80]);burst(L.rk.cx||1050,L.gy-L.rk.h*.6,50,'spark',300,1.2);if(k)await say(k)}
 function throwWhole(L,n){const r=L.rk;r.thr=T;SFX.whoosh();const p=newPiece(n,(r.cx||1050)-80,L.gy-r.h*.75,{hue:HUE.rask,vx:-8.5,vy:-7,av:2.5});p.cool=T+1.6;return p}
 LEVELS[5]=()=>{const L=mkLevel(5,{bg:'boss',music:'boss',gy:575,zx:150,zh:320,ph:150,grounds:[[-600,1900,575]],recover:{x:560,y:150},hp:4,hpMax:4});
- L.rk={x:1110,h:420};
+ L.rk={x:1110,h:480};if(!SV.done[5])G.heartBack=0;
  const shield=(b,a)=>{sock({cx:800,cy:300,n:b,fixed:[{n:a,at:'R',cols:Array(a).fill(HUE.rask)}],kind:'shield'});throwWhole(L,b)};
  const reThrow=t=>{// если целое потерялось (разрезано не так и куски улетели) — новое целое
   if(!L.pieces.length&&!L.sockets[0].fill&&T-(L.rk.thr||0)>3)throwWhole(L,t.b)};
@@ -29,7 +29,7 @@ async function runTasksBoss(){const L=LV;const all=L.tasks;
  L.tasks=all}
 // ---- сердце: 8 + x = 9 ----
 LEVELS[7]=()=>{const L=mkLevel(5,{bg:'boss',music:'cs',gy:575,zx:150,zh:320,ph:150,grounds:[[-600,1900,575]],recover:{x:900,y:300}});G.kind=true;
- L.rk={x:1110,h:420,kneel:true,noHeart:true};
+ L.rk={x:1110,h:480,kneel:true,noHeart:true};G.heartBack=T;
  L.tasks=[{vals:[8,'+','x','=',9],ans:1,t:'h_t',k:'h_k',chk:['x = 9 − 8 = 1','8 + 1 = 9'],setup(){sock({cx:700,cy:260,n:9,fixed:[{n:8,at:'L',cols:Array(8).fill(HUE.gold)}],kind:'moon'});const p=newPiece(1,960,380,{hue:HUE.rask,float:true,noCut:true});p.b.setGravityScale(0);
    L.guide={type:'drag',from:()=>{const p=L.pieces.find(p=>p.n===1&&!p.locked);return p&&pos(p)},to:{x:910,y:260},until:'lock',always:1}},done:()=>L.sockets[0].fill}];
  run(async()=>{await wait(500);await runTasks();FX.flash=1;FX.flashC='#fff';SFX.fanfare();await wait(1200);go('cs','whole')})};

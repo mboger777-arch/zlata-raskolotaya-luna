@@ -14,7 +14,16 @@ function camBg(n,z,fx,fy,shx,shy){const v=vis(),b=IM['bg_'+n];const s=Math.max(v
  const x0=clamp(v.x0+v.w/2-fx*s,v.x0+v.w-w,v.x0)+(shx||0),y0=clamp(v.y0+v.h/2-fy*s,v.y0+v.h-h,v.y0)+(shy||0);if(okI(b))X.drawImage(b,x0,y0,w,h);return{x0,y0,s}}
 function hero(n,x,gy,h,o){o=o||{};const br=o.still?1:1+.012*Math.sin(T*2.4+(o.ph||0));const ar=aspect(n);const hh=h*br;
  spr(n,x,gy,hh,{ax:.5,ay:1,flip:o.flip,blink:BLINKS.includes(n)?(o.seed||5):0,a:o.a});
+ if(HEARTP[n]&&pzHeart()){const q=HEARTP[n];const w=hh*ar;glowHeart(x+(q[0]-.5)*w*(o.flip?-1:1),gy-hh*(1-q[1]),hh*q[2],o.a)}
  if(AUD){const m=X.getTransform(),k=m.a/DPR;G.heroes.push({n,x:(m.e/DPR)+x*k,w:hh*ar*k,h:hh*k,ar,feet:(m.f/DPR)+gy*k})}}
+// сердечко Пазлика (дыра в груди на спрайтах: центр x/w, y/h, ширина/h)
+const HEARTP={p_wave:[.49,.528,.15],p_jump:[.495,.54,.155],p_idle:[.552,.532,.152]};
+function pzHeart(){return !!(SV.done&&SV.done[5])||!!G.heartBack}
+function heartPath(cx,cy,w){const h=w*.9,t=cy-h*.42;X.beginPath();X.moveTo(cx,cy+h*.5);X.bezierCurveTo(cx-w*.62,cy+h*.02,cx-w*.55,t-h*.25,cx-w*.25,t-h*.08);X.bezierCurveTo(cx-w*.1,t-h*.02,cx,t+h*.08,cx,t+h*.16);X.bezierCurveTo(cx,t+h*.08,cx+w*.1,t-h*.02,cx+w*.25,t-h*.08);X.bezierCurveTo(cx+w*.55,t-h*.25,cx+w*.62,cy+h*.02,cx,cy+h*.5);X.closePath()}
+function glowHeart(cx,cy,w,a){const pu=1+.06*Math.sin(T*5);w*=pu;X.save();if(a!=null)X.globalAlpha=a;
+ X.globalCompositeOperation='lighter';const g=X.createRadialGradient(cx,cy,w*.1,cx,cy,w*1.05);g.addColorStop(0,'rgba(255,150,170,.45)');g.addColorStop(1,'rgba(255,80,120,0)');X.fillStyle=g;X.beginPath();X.arc(cx,cy,w*1.05,0,7);X.fill();
+ X.globalCompositeOperation='source-over';const f=X.createLinearGradient(cx,cy-w*.5,cx,cy+w*.5);f.addColorStop(0,'#ff8fae');f.addColorStop(1,'#e0204f');X.fillStyle=f;X.shadowColor='#ff5080';X.shadowBlur=w*.5;heartPath(cx,cy,w);X.fill();
+ X.shadowBlur=0;X.lineWidth=Math.max(2,w*.06);X.strokeStyle='#fff0f4';X.stroke();X.fillStyle='rgba(255,255,255,.7)';X.beginPath();X.ellipse(cx-w*.22,cy-w*.18,w*.1,w*.06,-.6,0,7);X.fill();X.restore()}
 function plate(t,x,y,w,h,size,o){o=o||{};X.save();X.fillStyle=o.bg||'rgba(30,22,64,.9)';rr(x-w/2,y-h/2,w,h,Math.min(22,h/2));X.fill();X.lineWidth=4;X.strokeStyle=o.bd||'#d8c2ff';X.stroke();X.restore();
  textIn(t,x,y+1,w-h*.5,h*.72,size,o.col||'#fff6dc',{f:o.f||FONT,st:'#1a0e30',lw:5,id:o.id||'plate',min:14})}
 function drawParticlesIf(){stepParticles();drawParticles()}
@@ -67,13 +76,14 @@ const CS={
   {bg:'cs_whole',k:'w_4',z:[1.5,1.65],f:[[1000,470],[1020,480]],fx:'lanterns'},
   {bg:'cs_whole',k:'w_5',z:[1.15,1],f:[[800,400],[640,360]],fx:'lanterns'}],
   next(){go('fin')}}};
-SC.cs={enter(id){const c=CS[id];const st=this.st={id,c,i:0,t0:T,crack:-1,dur:3};music(c.music||'cs');if(id==='whole'||id==='heart')G.kind=true;
+SC.cs={enter(id){const c=CS[id];const st=this.st={id,c,i:0,t0:T,crack:-1,dur:3};music(c.music||'cs');if(id==='whole'||id==='heart')G.kind=true;if(id==='whole')G.heartBack=G.heartBack||T;
   run(async()=>{await wait(350);for(let i=0;i<c.shots.length;i++){const s=c.shots[i];st.i=i;st.t0=T;st.dur=lineDur(s.k);if(s.fx==='crack')setTimeout(()=>{if(this.st===st){st.crack=T;SFX.crack();SFX.quake&&SFX.quake();addShake(1);FX.flash=.8;FX.flashC='#e8d0ff';vib([60,40,120])}},(s.at||1)*1000);
     if(s.fx==='evil'&&i>0)SFX.roar&&SFX.roar();await say(s.k);await wait(350)}c.next()})},
  draw(){const st=this.st,s=st.c.shots[st.i];const k=clamp((T-st.t0)/Math.max(2,st.dur),0,1),e=ease(k);const sh=FX.shake*14;FX.shake=Math.max(0,FX.shake-DT*1.2);
   const z=lerp(s.z[0],s.z[1],e),fx=lerp(s.f[0][0],s.f[1][0],e),fy=lerp(s.f[0][1],s.f[1][1],e);const v=vis();X.fillStyle='#000';X.fillRect(v.x0,v.y0,v.w,v.h);
   const c=camBg(s.bg,z,fx,fy,(Math.random()-.5)*sh,(Math.random()-.5)*sh);
   csFx(s,c,st);
+  if(st.id==='whole'){const k=1;if(k>0)glowHeart(c.x0+1021*c.s,c.y0+524*c.s,50*c.s*(.4+.6*k),k)}
   for(const a of s.actors||[]){const tk=talk&&a.who&&talk.who===a.who;const n=tk&&a.talk?a.talk:a.n;let x=c.x0+a.x*c.s,y=c.y0+a.gy*c.s;if(a.shake)x+=Math.sin(T*30)*3;hero(n,x,y,a.h*c.s,{seed:a.x%9,ph:a.x});
    if(a.heart){X.save();X.globalCompositeOperation='lighter';const hx=x-a.h*c.s*.02,hy=y-a.h*c.s*.66;const g=X.createRadialGradient(hx,hy,2,hx,hy,60*c.s);g.addColorStop(0,'rgba(255,220,120,.95)');g.addColorStop(1,'rgba(255,160,40,0)');X.fillStyle=g;X.beginPath();X.arc(hx,hy,(50+8*Math.sin(T*6))*c.s,0,7);X.fill();X.restore()}}
   // киношные полосы-виньетка (не чёрные поля: рисунок под ними)
@@ -130,11 +140,11 @@ SC.play={world:1,enter(i){FX.shake=0;FX.slow=1;FX.flash=0;LEVELS[i]();music(LV.m
   if(L.rk)rDraw(L);
   if(L.rask)raskPeek(L);
   if(L.cradle)drawCradle(L.cradle);
-  X.globalAlpha=L.gA;for(const s of L.sockets)drawSocket(s);X.globalAlpha=1;
+  TAGQ=[];X.globalAlpha=L.gA;for(const s of L.sockets)drawSocket(s);X.globalAlpha=1;
   for(const g of L.guards){X.globalAlpha=L.gA;if(!g.noGolem)drawGolem(g,{h:L.idx===4?200:250});drawGuard(g);X.globalAlpha=1}
   if(L.idx===4){const y=430+Math.sin(T*1.3)*10;spr('whale',Math.max(200,safeL()+150),y+120,230,{ax:.5,ay:1});L.gy=y+30-6}
   drawHeroes(L);
-  drawPieces();drawRibbon(L);drawTrails();drawShard();drawParticlesIf();
+  drawPieces();drawRibbon(L);drawTrails();drawShard();drawParticlesIf();flushTags();
   if(L.task&&!L.task.solved)drawGuide(L);
   if(FX.flash>0){X.globalAlpha=clamp(FX.flash,0,1);X.fillStyle=FX.flashC;X.fillRect(v.x0,v.y0,v.w,v.h);X.globalAlpha=1;FX.flash-=DT*1.8}},
  hud(){drawHUD()}};
@@ -145,7 +155,7 @@ function raskPeek(L){const r=L.rask;const k=r.out?1-clamp((T-r.out)/.6,0,1):ease
 // ---- HUD ----
 const PORT={zlata:['z_talk',120,5,150],pazl:['p_wave',80,20,230],luna:['l_talk',90,10,150],rask:['r_proud',70,0,150],raskk:['r_kind',70,0,150]};
 function drawHUD(){const L=LV;const busy=!!talk;const t=L.task;
- const showB=t&&t.vals&&!busy&&(!t.solved||(L.hudFlash&&T-L.hudFlash<1.6));
+ const titleOn=T-L.titleT<3&&!busy;const showB=t&&t.vals&&!busy&&!titleOn&&(!t.solved||(L.hudFlash&&T-L.hudFlash<1.6));
  if(showB)drawTaskBoard(t.vals,640,safeT()+44,!!t.solved,t.ans);
  if(L.checks&&L.checks.length){const n=L.checks.length;L.checks.forEach((c,i)=>{const y=(busy?safeT()+170:safeT()+130)+i*70;plate('✓  '+c,640,y,Math.min(470,vis().w*.5),60,42,{f:NUM,col:'#d8ffb0',bd:'#9fe870',id:'chk'})})}
  if(L.idx<5){const x0=safeR()-58,y0=safeT()+40;X.fillStyle='rgba(30,22,64,.82)';rr(x0-62,y0-30,120,60,30);X.fill();X.strokeStyle='#d8c2ff';X.lineWidth=3;X.stroke();spr('shard',x0-30,y0,46,{rot:Math.sin(T)*.3});
@@ -174,7 +184,7 @@ SC.fin={enter(){music('win');G.kind=true;const st=this.st={med:-1};
    SV.done[5]=1;SV.fin=1;save();await say('w_6');st.end=T})},
  draw(){const v=vis();const st=this.st;bgG('fin',640);const gy=Math.min(640,v.y0+v.h-8);const hh=Math.min(v.h*.46,gy-safeT()-150);const cx=640;
   hero(talk&&talk.who==='luna'?'l_talk':'l_idle',cx-hh*1.25,gy,hh*1.1,{ph:1});hero('r_kind',cx+hh*1.15,gy,hh*1.15,{ph:2});
-  hero(talk&&talk.who==='zlata'?'z_talk':'z_cheer',cx-hh*.3,gy,hh,{seed:4});const hop=Math.max(0,Math.sin(T*3.4))*hh*.12;hero(hop>3?'p_jump':'p_wave',cx+hh*.4,gy-hop,hh*.48,{seed:7});
+  hero(talk&&talk.who==='zlata'?'z_talk':'z_cheer',cx-hh*.3,gy,hh,{seed:4});const jp=T%3.4,jumping=jp<.55;const hop=jumping?Math.sin(jp/.55*Math.PI)*hh*.1:0;hero(jumping?'p_jump':'p_wave',cx+hh*.4,gy-hop,hh*.48,{seed:7,still:jumping});
   if(st.med>0){const k=ease(clamp((T-st.med)/.8,0,1));const mh=Math.min(230,v.h*.33)*k;spr('medal',cx,safeT()+(talk?140:110)+mh/2+Math.sin(T*2)*5,mh,{rot:Math.sin(T*1.5)*.05});
    if(!talk)textIn('Мастер частей и целого',640,safeT()+52,Math.min(820,v.w*.62),84,66,'#ffe9a8',{f:FONT,st:'#1a0e40',lw:10,id:'mtitle'})}
   drawTalk();drawParticlesIf();if(Math.random()<.03&&st.med>0)burst(rnd(v.x0,v.x0+v.w),v.y0+30,20,'conf')},
