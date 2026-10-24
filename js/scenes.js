@@ -140,7 +140,7 @@ SC.play={world:1,enter(i){FX.shake=0;FX.slow=1;FX.flash=0;LEVELS[i]();music(LV.m
   if(L.rk)rDraw(L);
   if(L.rask)raskPeek(L);
   if(L.cradle)drawCradle(L.cradle);
-  TAGQ=[];X.globalAlpha=L.gA;for(const s of L.sockets)drawSocket(s);X.globalAlpha=1;
+  TAGQ=[];TAGOB=[];X.globalAlpha=L.gA;for(const s of L.sockets)drawSocket(s);X.globalAlpha=1;
   for(const g of L.guards){X.globalAlpha=L.gA;if(!g.noGolem)drawGolem(g,{h:L.idx===4?200:250});drawGuard(g);X.globalAlpha=1}
   if(L.idx===4){const y=430+Math.sin(T*1.3)*10;spr('whale',Math.max(200,safeL()+150),y+120,230,{ax:.5,ay:1});L.gy=y+30-6}
   drawHeroes(L);

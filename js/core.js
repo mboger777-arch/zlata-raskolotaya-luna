@@ -20,7 +20,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden){onOrient(
 if(window.visualViewport){visualViewport.addEventListener('resize',onOrient);visualViewport.addEventListener('scroll',onOrient)}
 setInterval(()=>{const[w,h]=vpWH();if(w!==_lastW||h!==_lastH)relayout()},500);rs();
 // ---- картинки ----
-const IM={};let NIMG=0,NLOAD=0;function img(n,src){if(IM[n])return IM[n];const i=new Image();NIMG++;i.onload=i.onerror=()=>NLOAD++;i.src=src+'?v=20261024a2';IM[n]=i;return i}
+const IM={};let NIMG=0,NLOAD=0;function img(n,src){if(IM[n])return IM[n];const i=new Image();NIMG++;i.onload=i.onerror=()=>NLOAD++;i.src=src+'?v=20261024a3';IM[n]=i;return i}
 const okI=i=>!!i&&(i.tagName==='CANVAS'||(i.complete&&i.naturalWidth>0));
 ['title','map','c1','c2','c3','c4','c5','boss','fin','rotate','cs_crack','cs_fall','cs_heart','cs_whole'].forEach(n=>img('bg_'+n,'assets/bg/'+n+'.jpg'));
 const SPRITES=['z_idle','z_talk','z_cheer','z_slash','z_push','z_oops','z_heart','p_idle','p_wave','p_jump','p_scared','l_idle','l_talk','l_weak','r_proud','r_attack','r_kneel','r_kind','r_gift','g_angry','g_happy','whale'];
@@ -100,7 +100,7 @@ async function say1(k){const l=LINES[k];if(!l)return;const id=++SAYID;talk={who:
  if(G.fast){await new Promise(r=>setTimeout(r,40));if(talk&&talk.id===id)talk=null;return}
  const v=typeof VOICE!=='undefined'&&VOICE[k];const dur=Math.max(1800,l.t.length*65);
  await new Promise(async res=>{let done=false,a=null;const fin=()=>{if(!done){done=true;if(a){try{a.pause()}catch(e){}}if(skipTalk===sk)skipTalk=null;res()}};const sk=()=>fin();skipTalk=sk;setTimeout(fin,((v&&v[1])||0)*1000+dur+9000);
-  if(v&&!G.mute){a=new Audio('assets/voice/'+v[0]+'?v=20261024a2');a.onended=()=>setTimeout(fin,250);a.onerror=()=>setTimeout(fin,dur);let ok=true;try{await a.play()}catch(e){ok=false}
+  if(v&&!G.mute){a=new Audio('assets/voice/'+v[0]+'?v=20261024a3');a.onended=()=>setTimeout(fin,250);a.onerror=()=>setTimeout(fin,dur);let ok=true;try{await a.play()}catch(e){ok=false}
    if(done)return;if(ok)setTimeout(fin,(v[1]+2.5)*1000);else setTimeout(fin,dur)}else setTimeout(fin,dur)});
  if(talk&&talk.id===id)talk=null}
 async function run(fn){G._busy++;try{await fn()}catch(e){if(e!==STALE)console.error(e)}finally{G._busy--}}
