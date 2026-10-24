@@ -17,8 +17,8 @@ def wer(a,b):
         for j_,y in enumerate(b,1): D[j_]=min(P_[j_]+1,D[j_-1]+1,P_[j_-1]+(x!=y))
     return D[-1]/max(1,len(a))
 for j in J:
-  w=j['who'];o=LN[j['k']]
-  if w not in P:P[w]=M.create_voice_clone_prompt(ref_audio=g['REF'][w][0],ref_text=g['REF'][w][1],x_vector_only_mode=False)
+  w=j['who'];o=LN[j['k']];rf=j.get('ref')or g['REF'][w];w=w+'|'+rf[0]
+  if w not in P:P[w]=M.create_voice_clone_prompt(ref_audio=rf[0],ref_text=rf[1],x_vector_only_mode=False)
   for vi,t in enumerate(j['vars']):
     for take in range(j.get('takes',3)):
       fin=f"/tmp/sg/{j.get('tag',j['k'])}_{vi}_{take}.mp3"
