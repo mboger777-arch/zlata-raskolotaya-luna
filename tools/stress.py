@@ -9,13 +9,13 @@ R=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 A=WhisperModel('small',device='cpu',compute_type='int8',cpu_threads=3)
 VOW='аеёиоуыэюя'
 # слово -> индекс ударного слога (0-based)
-RISK={'краск':0,'крыш':0,'пляск':0,'кольц':1,'весн':1,'сестр':1,'полоск':1,'полосок':1,'палоск':1,'палосок':1,'дорог':1,'ворон':1,'собак':1,'полочк':0,'косточк':0,'лодочк':0,'варя':0,'варе':0,'варю':0,'варей':0,'вари':0,'квадратик':1,'шуршик':1,'шуршык':1,'клякс':0,'клетк':0,'клеток':0,'клеточк':0,'клеточек':0}
+RISK={'злат':0,'раскол$':1,'раскола$':1,'расколу$':1,'расколом$':1,'пазлик':0,'отсеки':2,'отсеку':2,'брусок':1,'бруск':1,'пролет':1,'осколыш':1,'подобрел':2,'мечом':1,'луна$':1,'луну$':1,'луны$':1}
 def L(f): return np.frombuffer(subprocess.run(['ffmpeg','-loglevel','error','-i',f,'-f','f32le','-ac','1','-ar','16000','-'],capture_output=True).stdout,np.float32).copy()
 def nv(w): return sum(c in VOW for c in w)
 def stem(w):
   w=w.lower().replace('ё','е').strip('.,!?:;«»-— ')
   for k in sorted(RISK,key=len,reverse=True):
-    if w.startswith(k):return k,w
+    if (k.endswith('$') and w==k[:-1]) or (not k.endswith('$') and w.startswith(k)):return k,w
   return None,w
 def analyze(a,st,en,word):
   s0=int(max(0,st-.04)*16000);s1=int(min(len(a)/16000,en+.06)*16000);x=a[s0:s1]
