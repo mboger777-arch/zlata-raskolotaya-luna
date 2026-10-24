@@ -1,0 +1,160 @@
+{
+ "fps": 60,
+ "errs": [],
+ "fail": [],
+ "aud": [
+  [
+   "title",
+   3,
+   []
+  ],
+  [
+   "intro",
+   4,
+   []
+  ],
+  [
+   "map",
+   9,
+   []
+  ],
+  [
+   "c1",
+   6,
+   []
+  ],
+  [
+   "c2",
+   7,
+   []
+  ],
+  [
+   "c3",
+   7,
+   []
+  ],
+  [
+   "c4",
+   7,
+   []
+  ],
+  [
+   "c5",
+   7,
+   []
+  ],
+  [
+   "cs_fall",
+   13,
+   []
+  ],
+  [
+   "boss",
+   6,
+   []
+  ],
+  [
+   "cs_heart",
+   6,
+   []
+  ],
+  [
+   "heart",
+   6,
+   []
+  ],
+  [
+   "fin",
+   2,
+   []
+  ],
+  [
+   "map_end",
+   13,
+   []
+  ],
+  [
+   "bake",
+   8,
+   []
+  ]
+ ],
+ "log": [
+  "audit ok title 3 texts 2 heroes",
+  "audit ok intro 4 texts 0 heroes",
+  "cs after next 1",
+  "audit ok map 9 texts 2 heroes",
+  "LEVEL 0 {'scene': 'play', 'arg': 0, 'talk': None, 'cs': None, 'idx': 0, 'cur': 0, 'task': {'vals': [8, '=', 3, '+', 5], 'ans': None, 'solved': False}, 'tasks': [False, False], 'won': False, 'score': None, 'shard': None, 'mark': None}",
+  "audit ok c1 6 texts 2 heroes",
+  "  mistake whole8->mold3 registered",
+  "shard {'on': True, 'x': 134.18220799997883, 'y': 188.29773427852763, 'got': True}",
+  "  mistake 2->6 short registered",
+  "  pre-fuse [[4, -26.09, 0, 0, 6], [2, -3.85, 0, 0, 7]] 7 6 744 303",
+  "  fused? [(6, 763, 303)]",
+  "LEVEL 1 {'scene': 'play', 'arg': 1, 'talk': None, 'cs': None, 'idx': 1, 'cur': 0, 'task': {'vals': ['x', '+', 3, '=', 8], 'ans': 5, 'solved': False}, 'tasks': [False, False, False], 'won': False, 'score': None, 'shard': None, 'mark': None}",
+  "audit ok c2 7 texts 2 heroes",
+  "  mistake whole8 on bridge registered",
+  "shard {'on': True, 'x': 134.20555200006007, 'y': 188.30110025660474, 'got': True}",
+  "  mistake whole9 on bridge registered",
+  "  mistake whole9 on bridge registered",
+  "LEVEL 2 {'scene': 'play', 'arg': 2, 'talk': None, 'cs': None, 'idx': 2, 'cur': 0, 'task': {'vals': ['x', '−', 2, '=', 7], 'ans': 9, 'solved': False}, 'tasks': [False, False, False], 'won': False, 'score': None, 'shard': None, 'mark': None}",
+  "audit ok c3 7 texts 2 heroes",
+  "  mistake 7 into key 9 registered",
+  "  pre-fuse [[7, -3.88, 0, 0, 23], [2, -67.3, 0, 0, 24]] 24 23 739 563",
+  "  fused? [(9, 948, 563)]",
+  "shard {'on': True, 'x': 352.0517600002108, 'y': 198.0654894545483, 'got': True}",
+  "  mistake 4 into key 7 registered",
+  "  pre-fuse [[4, -4.43, 0, 0, 27], [3, -80.32, 0, 0, 28], [2, -80.32, 0, 0, 29]] 28 27 641 511",
+  "  fused? [(2, 832, 563), (7, 754, 515)]",
+  "  mistake 3 into key 8 registered",
+  "  moved target to 150 488.24107812395437",
+  "  pre-fuse [[3, -1.48, 0, 0, 32], [5, -94.23, 0, 0, 33], [4, -94.23, 0, 0, 34]] 33 32 394 563",
+  "  fused? [(4, 848, 563), (8, 304, 563)]",
+  "LEVEL 3 {'scene': 'play', 'arg': 3, 'talk': None, 'cs': None, 'idx': 3, 'cur': 0, 'task': {'vals': [8, '−', 'x', '=', 3], 'ans': 5, 'solved': False}, 'tasks': [False, False, False], 'won': False, 'score': None, 'shard': None, 'mark': None}",
+  "audit ok c4 7 texts 3 heroes",
+  "  mistake guard too deep 8->2 registered",
+  "  after undo n= 8",
+  "shard {'on': True, 'x': 141.9791040001738, 'y': 189.3983885203807, 'got': True}",
+  "  mistake guard too deep 7->4 registered",
+  "  after undo n= 7",
+  "  mistake guard too deep 6->1 registered",
+  "  after undo n= 6",
+  "LEVEL 4 {'scene': 'play', 'arg': 4, 'talk': None, 'cs': None, 'idx': 4, 'cur': 0, 'task': {'vals': ['x', '+', 5, '=', 9], 'ans': 4, 'solved': False}, 'tasks': [False, False, False], 'won': False, 'score': None, 'shard': None, 'mark': None}",
+  "audit ok c5 7 texts 2 heroes",
+  "  mistake whole7 into sky9 registered",
+  "shard {'on': True, 'x': 134.18220800018034, 'y': 198.29773427855667, 'got': True}",
+  "  mistake 2 into sky7 registered",
+  "  pre-fuse [[4, -169.17, 0, 0, 50], [3, -169.17, 0, 0, 51], [2, -3.88, 0, 0, 52]] 51 50 1054 183",
+  "  fused? [(9, 869, 221)]",
+  "  over-fused into 9 -> undo",
+  "  after drop [] []",
+  "  mistake sky guard too deep registered",
+  "audit ok cs_fall 13 texts 2 heroes",
+  "SHARDS 5",
+  "LEVEL 5 {'scene': 'play', 'arg': 5, 'talk': None, 'cs': None, 'idx': 5, 'cur': 0, 'task': {'vals': [3, '+', 'x', '=', 7], 'ans': 4, 'solved': False}, 'tasks': [False], 'won': False, 'score': None, 'shard': None, 'mark': None}",
+  "audit ok boss 6 texts 3 heroes",
+  "  mistake boss whole7 into shield registered",
+  "  mistake boss 2 short registered",
+  "  mistake armor too deep registered",
+  "  mistake boss frag 3 registered",
+  "  moved target to 180 313.38243800317866",
+  "  pre-fuse [[4, -1.48, 0, 0, 72], [3, -5.88, 0, 0, 73], [5, -212.18, 0, 0, 74]] 74 72 447 483",
+  "  fused? [(4, 189, 548), (3, 703, 548), (5, 450, 521)]",
+  "  retry fuse",
+  "  moved target to 180 313.38243800318776",
+  "  fused during move",
+  "audit ok cs_heart 6 texts 3 heroes",
+  "audit ok heart 6 texts 3 heroes",
+  "  heart miss: piece stays free, retry",
+  "audit ok fin 2 texts 4 heroes",
+  "audit ok map_end 13 texts 2 heroes",
+  "audit ok bake 8 texts 2 heroes",
+  "  mistake pie whole10 registered",
+  "bake score 1",
+  "bake score 2",
+  "bake score 3",
+  "bake best 3",
+  "FPS 60 ERR []",
+  "FAILS []"
+ ]
+}
