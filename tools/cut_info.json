@@ -93,5 +93,65 @@
   "w": 292,
   "h": 640,
   "edge": false
+ },
+ "shard": {
+  "w": 384,
+  "h": 400,
+  "edge": false
+ },
+ "medal": {
+  "w": 259,
+  "h": 400,
+  "edge": false
+ },
+ "pie": {
+  "w": 400,
+  "h": 317,
+  "edge": false
+ },
+ "cake": {
+  "w": 400,
+  "h": 379,
+  "edge": false
+ },
+ "lantern": {
+  "w": 257,
+  "h": 400,
+  "edge": false
+ },
+ "moonfrag": {
+  "w": 360,
+  "h": 400,
+  "edge": false
+ },
+ "board": {
+  "w": 835,
+  "h": 310,
+  "edge": false
+ },
+ "btn_o": {
+  "w": 394,
+  "h": 400,
+  "edge": false
+ },
+ "socket": {
+  "w": 400,
+  "h": 135,
+  "edge": false
+ },
+ "g_angry": {
+  "w": 537,
+  "h": 640,
+  "edge": false
+ },
+ "g_happy": {
+  "w": 595,
+  "h": 640,
+  "edge": false
+ },
+ "whale": {
+  "w": 640,
+  "h": 416,
+  "edge": false
  }
 }

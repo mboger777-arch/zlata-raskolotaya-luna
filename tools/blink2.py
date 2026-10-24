@@ -3,7 +3,7 @@
 import numpy as np,cv2,sys,json
 from PIL import Image
 EY=json.load(open('tools/eyes.json'))
-CFG={'p':dict(soft=.14,sc=1.12,fill='copy',th=.09,col=(70,32,10)),'k':dict(soft=.12,sc=1.12,fill='inpaint',th=.17,col=(12,10,10))}
+CFG={'p':dict(soft=.08,sc=1.12,fill='inpaint',th=.08,col=(70,40,20)),'k':dict(soft=.12,sc=1.12,fill='inpaint',th=.17,col=(12,10,10))}
 for n in sys.argv[1:]:
   c=CFG[n[0]];im=np.array(Image.open(f'assets/sprites/{n}.webp').convert('RGBA'));H,W=im.shape[:2];al=im[...,3]
   out=im[...,:3].copy();yy,xx=np.mgrid[0:H,0:W];S=4;arcs=[]

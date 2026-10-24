@@ -24,7 +24,7 @@ const IM={};let NIMG=0,NLOAD=0;function img(n,src){if(IM[n])return IM[n];const i
 const okI=i=>!!i&&(i.tagName==='CANVAS'||(i.complete&&i.naturalWidth>0));
 ['title','map','c1','c2','c3','c4','c5','boss','fin','rotate','cs_crack','cs_fall','cs_heart','cs_whole'].forEach(n=>img('bg_'+n,'assets/bg/'+n+'.jpg'));
 const SPRITES=['z_idle','z_talk','z_cheer','z_slash','z_push','z_oops','z_heart','p_idle','p_wave','p_jump','p_scared','l_idle','l_talk','l_weak','r_proud','r_attack','r_kneel','r_kind','r_gift','g_angry','g_happy','whale'];
-const BLINKS=[];
+const BLINKS=['z_idle','z_talk','z_cheer','p_idle'];
 SPRITES.forEach(n=>{img(n,'assets/sprites/'+n+'.webp');if(BLINKS.includes(n))img(n+'_b','assets/sprites/'+n+'_b.webp')});
 ['shard','medal','pie','cake','lantern','moonfrag','board','btn_o','socket'].forEach(n=>img(n,'assets/ui/'+n+'.webp'));
 const FONT='FairyLogo, Georgia, serif',BODY='Pangolin, "Comic Sans MS", sans-serif',NUM='NunitoLogo, "Arial Black", sans-serif';
