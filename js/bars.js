@@ -63,7 +63,7 @@ function heldStep(dt){const L=LV;for(const [,st] of L.ptr){if(st.kind!=='piece'|
   const tx=(st.x+st.ox)/BS,ty=(st.y+st.oy)/BS;let vx=(tx-q.x)*18,vy=(ty-q.y)*18;const sp=Math.hypot(vx,vy);if(sp>30){vx*=30/sp;vy*=30/sp}b.setLinearVelocity(V(vx,vy));
   const a=b.getAngle();const tgt=Math.round(a/Math.PI)*Math.PI;b.setAngularVelocity((tgt-a)*12);
   // сплавление
-  if(T>p.fuseCool)tryFuse(p,st)}}
+  if(T>p.fuseCool&&st.moved>40)tryFuse(p,st)}}
 function tryFuse(p,st){const L=LV,E=ends(p);let best=null;
  for(const q of L.pieces){if(q===p||q.locked||q.sock||q.dead||q.guardPart||T<q.fuseCool||q.noFuse||p.noFuse)continue;if((p.hist&&p.hist.sib===q.id)||(q.hist&&q.hist.sib===p.id))continue;// братья по разрезу не слипаются (для этого двойной тап)
 const F=ends(q);

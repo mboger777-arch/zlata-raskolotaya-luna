@@ -7,7 +7,7 @@ LOG=[];FAIL=[];AUDS=[];BS=60
 def log(*a):
   s=' '.join(str(x) for x in a);LOG.append(s);print(s,flush=True)
 async def main():
-  os.makedirs(OUT,exist_ok=True)
+  import shutil;shutil.rmtree(OUT,ignore_errors=True);os.makedirs(OUT,exist_ok=True)
   async with async_playwright() as p:
     b=await p.chromium.launch(args=['--autoplay-policy=no-user-gesture-required'])
     pg=await b.new_page(viewport={'width':W,'height':H},has_touch=True,device_scale_factor=2)
@@ -58,11 +58,16 @@ async def main():
       for i in range(1,n+1):
         await pg.mouse.move(a[0]+(bb[0]-a[0])*i/n,a[1]+(bb[1]-a[1])*i/n);await W8(18)
       await pg.mouse.up();await W8(60)
-    async def drag(x0,y0,x1,y1,n=22,hold=250):
-      a=await C(x0,y0);bb=await C(x1,y1)
-      await pg.mouse.move(*a);await pg.mouse.down();await W8(40)
-      for i in range(1,n+1):
-        k=i/n;await pg.mouse.move(a[0]+(bb[0]-a[0])*k,a[1]+(bb[1]-a[1])*k);await W8(18)
+    async def drag(x0,y0,x1,y1,n=22,hold=250,lift=True):
+      pts=[(x0,y0)]
+      if lift and abs(x1-x0)>80:
+        ly=max(140,min(y0,y1)-110);pts+=[(x0,ly),(x1,ly)]
+      pts.append((x1,y1));P=[await C(*q) for q in pts]
+      await pg.mouse.move(*P[0]);await pg.mouse.down();await W8(40)
+      for a,bb in zip(P,P[1:]):
+        m=max(6,n//(len(P)-1))
+        for i in range(1,m+1):
+          k=i/m;await pg.mouse.move(a[0]+(bb[0]-a[0])*k,a[1]+(bb[1]-a[1])*k);await W8(18)
       await W8(hold);await pg.mouse.up();await W8(80)
     async def tap2(x,y):
       a=await C(x,y)
