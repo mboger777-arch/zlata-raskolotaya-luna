@@ -9,7 +9,7 @@ R=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 A=WhisperModel('small',device='cpu',compute_type='int8',cpu_threads=3)
 VOW='аеёиоуыэюя'
 # слово -> индекс ударного слога (0-based)
-RISK={'злат':0,'раскол$':1,'раскола$':1,'расколу$':1,'расколом$':1,'пазлик':0,'отсеки':2,'отсеку':2,'брусок':1,'бруск':1,'пролет':1,'осколыш':1,'подобрел':2,'мечом':1,'луна$':1,'луну$':1,'луны$':1}
+RISK={'злат':0,'раскол$':1,'раскола$':1,'расколу$':1,'расколом$':1,'пазлик':0,'отсеки':2,'отсеку':2,'брусок':1,'бруск':1,'пролет':1,'осколыш':1,'подобрел':2,'мечом':1,'мячом':1,'луна$':1,'луну$':1,'луны$':1}
 def L(f): return np.frombuffer(subprocess.run(['ffmpeg','-loglevel','error','-i',f,'-f','f32le','-ac','1','-ar','16000','-'],capture_output=True).stdout,np.float32).copy()
 def nv(w): return sum(c in VOW for c in w)
 def stem(w):

@@ -3,7 +3,7 @@
 import json,os,re,sys,subprocess,torch,soundfile as sf,numpy as np
 R=os.path.dirname(os.path.dirname(os.path.abspath(__file__)));src=open(R+'/tools/voicegen.py').read()
 g={'__file__':R+'/tools/voicegen.py'};exec(src[:src.index('lines=json.load')],g)
-sys.path.insert(0,R+'/tools');import stress311 as S
+sys.path.insert(0,R+'/tools');import stress as S
 from qwen_tts import Qwen3TTSModel
 torch.set_num_threads(int(os.environ.get('NT','6')))
 M=Qwen3TTSModel.from_pretrained('Qwen/Qwen3-TTS-12Hz-1.7B-Base',device_map='cpu',dtype=torch.float32);P={}

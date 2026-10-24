@@ -142,10 +142,17 @@ async def main():
       _,tx,ty=max(c)
       log('  pre-fuse',await ev('LV.pieces.map(p=>[p.n,+(p.fuseCool-T).toFixed(2),p.noFuse||0,p.hist&&p.hist.sib||0,p.id])'),a['id'],bq['id'],round(tx),round(ty))
       await drag(a['x'],a['y'],tx,ty,hold=450,lift='always');await settle(500);FC[0]+=1;await shot(f'fuse_{FC[0]}');log('  fused?',[(q['n'],round(q['x']),round(q['y'])) for q in await pcs()])
+      if not await piece(na+nb):
+        big=[q for q in await pcs() if q['n']>na+nb and not q['locked'] and not q['sock']]
+        if big:
+          q=big[0];log('  over-fused into',q['n'],'-> undo');await tap2(q['x'],q['y']);await settle(700)
+          if await piece(na+nb): return
       if tries>1 and not await piece(na+nb) and await piece(na) and await piece(nb): log('  retry fuse');return await fuse(na,nb,tries-1)
     async def gcut(b):
       for t in range(3):
-        g=(await ev("__T.guards()"))[0];n0=g['n'];y=g['gy']-b*BS;await swipe(g['x']-90,y-4,g['x']+90,y+4);await W8(250)
+        gs=await ev("__T.guards()")
+        if not gs: FAIL.append('no guard');log('  no guard');return
+        g=gs[0];n0=g['n'];y=g['gy']-b*BS;await swipe(g['x']-90,y-4,g['x']+90,y+4);await W8(250)
         g2=(await ev("__T.guards()"))[0]
         if g2['n']!=n0: return
         log('  gcut miss',b,g,await ev("__T.st().talk"));await W8(1200)
