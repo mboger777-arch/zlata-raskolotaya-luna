@@ -1,0 +1,97 @@
+{
+ "z_idle": {
+  "w": 210,
+  "h": 640,
+  "edge": false
+ },
+ "z_talk": {
+  "w": 297,
+  "h": 640,
+  "edge": false
+ },
+ "z_cheer": {
+  "w": 319,
+  "h": 640,
+  "edge": false
+ },
+ "z_slash": {
+  "w": 409,
+  "h": 640,
+  "edge": false
+ },
+ "z_push": {
+  "w": 361,
+  "h": 640,
+  "edge": false
+ },
+ "z_oops": {
+  "w": 221,
+  "h": 640,
+  "edge": false
+ },
+ "z_heart": {
+  "w": 214,
+  "h": 640,
+  "edge": false
+ },
+ "p_idle": {
+  "w": 438,
+  "h": 640,
+  "edge": false
+ },
+ "p_wave": {
+  "w": 495,
+  "h": 640,
+  "edge": false
+ },
+ "p_jump": {
+  "w": 589,
+  "h": 640,
+  "edge": false
+ },
+ "p_scared": {
+  "w": 333,
+  "h": 640,
+  "edge": false
+ },
+ "l_idle": {
+  "w": 312,
+  "h": 640,
+  "edge": false
+ },
+ "l_talk": {
+  "w": 309,
+  "h": 640,
+  "edge": false
+ },
+ "l_weak": {
+  "w": 314,
+  "h": 640,
+  "edge": false
+ },
+ "r_proud": {
+  "w": 265,
+  "h": 640,
+  "edge": false
+ },
+ "r_attack": {
+  "w": 375,
+  "h": 640,
+  "edge": false
+ },
+ "r_kneel": {
+  "w": 640,
+  "h": 628,
+  "edge": false
+ },
+ "r_kind": {
+  "w": 282,
+  "h": 640,
+  "edge": false
+ },
+ "r_gift": {
+  "w": 292,
+  "h": 640,
+  "edge": false
+ }
+}

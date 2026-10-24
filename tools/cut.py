@@ -18,18 +18,18 @@ def clean(a):
         rgb=a[...,:3].copy();rgb[edge]=a[...,:3][idx[0][edge],idx[1][edge]];a[...,:3]=rgb
     a[...,3]=al;return a
 SHEETS={
- 'yarik_front':('sprites',['y_idle','y_cheer','y_point']),
- 'yarik_run':('sprites',['y_run1','y_run2','y_jump','y_dash']),
- 'yarik_act':('sprites',['y_swing','y_carry','y_throw','y_react']),
- 'popr':('sprites',['p_sit','p_jump','p_ball','p_talk']),
- 'ulya':('sprites',['u_idle','u_talk','u_cheer']),
- 'kav':('sprites',['k_laugh','_k_s0','k_dizzy','k_kind']),
- 'kav2':('sprites',['k_squat','k_fly','k_hit']),
- 'props':('ui',['crate','ring','tramp','gear','mouse','mouse_dz','ball','medal']),
- 'ui':('ui',['board','btn_t','btn_o','hook','slot','gate','hat','flipper'])}
+ 'zlata_front':('sprites',['z_idle','z_talk','z_cheer']),
+ 'zlata_act':('sprites',['z_slash','z_push','z_oops','z_heart']),
+ 'pazlik':('sprites',['p_idle','p_wave','p_jump','p_scared']),
+ 'luna':('sprites',['l_idle','l_talk','l_weak']),
+ 'raskol':('sprites',['r_proud','r_attack','r_kneel']),
+ 'raskol2':('sprites',['r_kind','r_gift']),
+ 'creatures':('sprites',['g_angry','g_happy','whale']),
+ 'items':('ui',['shard','medal','pie','cake','lantern','moonfrag']),
+ 'ui':('ui',['board','btn_o','socket'])}
 KEY=set()
 ONLYN=set(os.environ.get('ONLY','').split(','))-{''}
-FILL={'board','btn_t','btn_o','crate','gear','ball','medal','gate'}
+FILL={'board','btn_o','medal','socket','lantern','pie','cake'}
 INFO=json.load(open('tools/cut_info.json')) if os.path.exists('tools/cut_info.json') else {}
 only=sys.argv[1:]
 for sh,(dst,names) in SHEETS.items():
@@ -47,13 +47,13 @@ for sh,(dst,names) in SHEETS.items():
             if szs[i]<0.002*m.size:continue
             col=[j for j in range(len(cb)-1) if cb[j]<=cx<cb[j+1]][0];lab[l2==i+1]=col+1
         n=len(cb)-1
-    else: lab,n=ndimage.label(ndimage.binary_dilation(m,iterations={'ui':3,'props':4}.get(sh,int(Wd*.012))))
+    else: lab,n=ndimage.label(ndimage.binary_dilation(m,iterations={'ui':3,'props':4,'items':4}.get(sh,int(Wd*.012))))
     objs=ndimage.find_objects(lab);sz=[(lab[o]==i+1).sum() for i,o in enumerate(objs)]
     bb=[(o[1].start,o[0].start,o[1].stop,o[0].stop) for i,o in enumerate(objs) if sz[i]>0.04*max(sz)]
     if len(names)==1: bb=[(min(b[0] for b in bb),min(b[1] for b in bb),max(b[2] for b in bb),max(b[3] for b in bb))]
     bb.sort(key=lambda b:(b[1]+b[3])/2);rows=[];
     for b in bb:
-        if rows and abs((b[1]+b[3])/2-np.mean([(r[1]+r[3])/2 for r in rows[-1]]))<Hd*(.17 if sh in ('props','ui') else 1): rows[-1].append(b)
+        if rows and abs((b[1]+b[3])/2-np.mean([(r[1]+r[3])/2 for r in rows[-1]]))<Hd*(.17 if sh in ('props','ui','items') else 1): rows[-1].append(b)
         else: rows.append([b])
     bb=[b for r in rows for b in sorted(r,key=lambda b:b[0])]
     if len(bb)!=len(names): print('!!',sh,'found',len(bb),'need',len(names),bb);continue
