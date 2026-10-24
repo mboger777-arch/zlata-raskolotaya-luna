@@ -92,6 +92,7 @@ function wait(ms){const c=ctxNow();return new Promise((r,j)=>setTimeout(()=>aliv
 let SAYID=0,SAYQ=Promise.resolve(),SAYEP=0,VOL_DUCK=0;
 // реплики никогда не обрываются: stopTalk лишь отменяет очередь, текущая фраза договаривается
 function stopTalk(){SAYEP++}
+function hardStop(){SAYEP++;if(skipTalk)skipTalk();talk=null}
 function say(k){const ep=SAYEP,c=ctxNow();const p=SAYQ.then(()=>ep===SAYEP&&alive(c)?say1(k):null);SAYQ=p.catch(()=>{});return p.then(v=>{if(!alive(c))throw STALE;return v})}
 function sayNow(k){stopTalk();return say(k).catch(()=>{})}
 function sayQ(k){say(k).catch(()=>{})}
