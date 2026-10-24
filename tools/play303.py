@@ -13,7 +13,7 @@ async def main():
     pg=await b.new_page(viewport={'width':W,'height':H},has_touch=True,device_scale_factor=2)
     errs=[];pg.on('console',lambda m: errs.append(m.text) if m.type=='error' else None);pg.on('pageerror',lambda e: errs.append(str(e)))
     await pg.goto(URL);await pg.wait_for_timeout(3000)
-    await pg.evaluate("localStorage.clear();G.fast=true;0")
+    await pg.evaluate("localStorage.clear();0")
     W8=lambda ms: pg.wait_for_timeout(ms);ev=pg.evaluate
     async def st(): return await ev("__T.st()")
     async def shot(n): await pg.screenshot(path=f'{OUT}/{n}.jpg',type='jpeg',quality=72)
@@ -76,7 +76,14 @@ async def main():
     async def mist(): return await ev("LV?LV.mist:0")
     async def ready(timeout=20000):
       return await until("(()=>{const s=__T.st();return s.scene==='play'&&s.task&&!s.task.solved&&!s.talk})()",timeout)
-    async def settle(ms=900): await W8(ms)
+    async def settle(ms=900):
+      await W8(min(ms,400))
+      if await ev("LV&&LV.zeroG"): await W8(max(0,ms-400));return
+      t0=time.time();a=await pcs()
+      while time.time()-t0<5:
+        await W8(150);bq=await pcs()
+        if len(a)==len(bq) and all(abs(x['x']-y['x'])<1.5 and abs(x['y']-y['y'])<1.5 for x,y in zip(a,bq)): return
+        a=bq
     async def cut(n,m):
       q=await piece(n)
       if not q: log('no piece',n);FAIL.append(f'no piece {n}');return
@@ -105,7 +112,9 @@ async def main():
       log('no guard piece to undo');return False
     async def solved(timeout=9000):
       ok=await until("(()=>{const s=__T.st();return !s.task||s.task.solved||s.scene!=='play'})()",timeout)
-      if not ok: FAIL.append('not solved '+json.dumps(await st()));log('NOT SOLVED',await st())
+      if not ok:
+        FAIL.append('not solved '+json.dumps(await st()));log('NOT SOLVED',await st());await shot('FAIL_'+str(len(FAIL)))
+        if len(FAIL)>2: raise SystemExit('too many fails')
       return ok
     async def shard_try():
       ok=await until("(()=>{const s=__T.st().shard;return s&&s.on&&s.x>vis().x0+120&&s.x<vis().x0+vis().w-160})()",16000,60)
@@ -118,9 +127,9 @@ async def main():
     # ---------- титул и интро
     G_SCENE[0]='title';await shot('00_title');await audit('title')
     await btn('play');await until("G.scene==='cs'",4000);await W8(900);await shot('01_intro');await audit('intro')
-    await btn('next');await W8(300);await btn('skip');await until("G.scene==='map'",5000);G_SCENE[0]='map';await W8(1200);await shot('02_map');await audit('map')
+    await btn('next');await W8(400);i1=(await st())['cs'];log('cs after next',i1);await btn('skip');await ev('G.fast=true');await until("G.scene==='map'",5000);G_SCENE[0]='map';await W8(1200);await shot('02_map');await audit('map')
     async def level(i):
-      await btn('n'+i);await until("G.scene==='play'",4000);G_SCENE[0]='play';await ready()
+      await btn('n'+str(i));await until("G.scene==='play'",4000);G_SCENE[0]='play';await ready()
       log('LEVEL',i,await st())
     async def finish(to='map',timeout=20000):
       ok=await until(f"G.scene==='{to}'",timeout)

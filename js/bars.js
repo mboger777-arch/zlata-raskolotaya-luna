@@ -65,7 +65,8 @@ function heldStep(dt){const L=LV;for(const [,st] of L.ptr){if(st.kind!=='piece'|
   // сплавление
   if(T>p.fuseCool)tryFuse(p,st)}}
 function tryFuse(p,st){const L=LV,E=ends(p);let best=null;
- for(const q of L.pieces){if(q===p||q.locked||q.sock||q.dead||q.guardPart||T<q.fuseCool||q.noFuse||p.noFuse)continue;const F=ends(q);
+ for(const q of L.pieces){if(q===p||q.locked||q.sock||q.dead||q.guardPart||T<q.fuseCool||q.noFuse||p.noFuse)continue;if((p.hist&&p.hist.sib===q.id)||(q.hist&&q.hist.sib===p.id))continue;// братья по разрезу не слипаются (для этого двойной тап)
+const F=ends(q);
   for(let i=0;i<2;i++)for(let j=0;j<2;j++){const d=Math.hypot(E[i].x-F[j].x,E[i].y-F[j].y);if(d<.8*BS&&(!best||d<best.d))best={q,d,i,j}}}
  if(!best)return;const q=best.q;
  if(p.n+q.n>L.maxN){if(lim('big',2500)){L.ev.push({e:'big'});SFX.bad();p.fuseCool=T+1;q.fuseCool=T+1;const qq=pos(q),pp=pos(p);if(q.b)q.b.setLinearVelocity(V(Math.sign(qq.x-pp.x||1)*5,-4))}return}
