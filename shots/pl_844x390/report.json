@@ -1,9 +1,7 @@
 {
  "fps": 60,
  "errs": [],
- "fail": [
-  "no piece 8"
- ],
+ "fail": [],
  "aud": [
   [
    "title",
@@ -34,14 +32,18 @@
   "LEVEL 2 {'scene': 'play', 'arg': 2, 'talk': None, 'cs': None, 'idx': 2, 'cur': 0, 'task': {'vals': ['x', '−', 2, '=', 7], 'ans': 9, 'solved': False}, 'tasks': [False, False, False], 'won': False, 'score': None, 'shard': None, 'mark': None}",
   "audit ok c3 6 texts 2 heroes",
   "  mistake 7 into key 9 registered",
-  "  fused? [(9, 889, 563)]",
-  "shard {'on': True, 'x': 313.62704615381284, 'y': 196.98880820097338, 'got': True}",
+  "  pre-fuse [[7, -4.13, 0, 0, 2], [2, -18.55, 0, 0, 3]] 3 2 557 563",
+  "  fused? [(9, 767, 563)]",
+  "shard {'on': True, 'x': 313.62704615381875, 'y': 196.98880820097298, 'got': True}",
   "  mistake 4 into key 7 registered",
-  "  fused? [(2, 891, 563), (7, 771, 522)]",
+  "  moved target to 180 460.53292372990757",
+  "  pre-fuse [[4, -1.52, 0, 0, 6], [3, -33.18, 0, 0, 7], [2, -33.18, 0, 0, 8]] 7 6 394 563",
+  "  fused? [(2, 821, 563), (7, 274, 563)]",
   "  mistake 3 into key 8 registered",
-  "  fused? []",
-  "no piece 8 []",
+  "  moved target to 150 422.92006963523227",
+  "  pre-fuse [[3, -1.57, 0, 0, 11], [5, -47.4, 0, 0, 12], [4, -47.4, 0, 0, 13]] 12 11 394 563",
+  "  fused? [(4, 774, 563), (8, 304, 563)]",
   "FPS 60 ERR []",
-  "FAILS ['no piece 8']"
+  "FAILS []"
  ]
 }

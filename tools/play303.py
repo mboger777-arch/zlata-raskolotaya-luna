@@ -35,7 +35,7 @@ async def main():
       AUDS.append((name,len(a['t']),bad))
       if bad: log('AUDIT',name,bad[:6])
       else: log('audit ok',name,len(a['t']),'texts',len(a['h']),'heroes')
-    G_SCENE=['']
+    G_SCENE=[''];FC=[0]
     want=lambda k: not os.environ.get('ONLY') or k in os.environ['ONLY'].split(',')
     async def until(js,timeout=8000,step=100):
       t0=time.time()
@@ -59,10 +59,10 @@ async def main():
       for i in range(1,n+1):
         await pg.mouse.move(a[0]+(bb[0]-a[0])*i/n,a[1]+(bb[1]-a[1])*i/n);await W8(18)
       await pg.mouse.up();await W8(60)
-    async def drag(x0,y0,x1,y1,n=22,hold=250,lift=True):
+    async def drag(x0,y0,x1,y1,n=22,hold=250,lift=True,ly=None):
       pts=[(x0,y0)]
       if lift=='always' or (lift and abs(x1-x0)>80):
-        ly=max(140,min(y0,y1)-110);pts+=[(x0,ly),(x1,ly)]
+        ly=ly or max(140,min(y0,y1)-110);pts+=[(x0,ly),(x1,ly)]
       pts.append((x1,y1));P=[await C(*q) for q in pts]
       await pg.mouse.move(*P[0]);await pg.mouse.down();await W8(40)
       for a,bb in zip(P,P[1:]):
@@ -103,23 +103,32 @@ async def main():
       s=(await ev("__T.socks()"))[si];x=(s['x0']+s['x1'])/2+dx;y=s['y']
       await drag(q['x'],q['y'],x,y)
     async def fuse(na,nb):
+      await settle(300)
       a=await piece(na);bq=await piece(nb)
       if not a or not bq: log('fuse miss',na,nb,[(q['n'],round(q['x']),round(q['y']),q['sock']) for q in await pcs()]);FAIL.append(f'fuse {na}+{nb}');return
-      E=await ev(f"__T.ends({bq['id']})");r=max(E,key=lambda e:e['x']);l=min(E,key=lambda e:e['x'])
-      vr=min(await ev('vis().x0+vis().w-40'),1100);vl=max(await ev('vis().x0+40'),60)
-      others=[]
-      for o in await pcs():
-        if o['id'] in (a['id'],bq['id']) or o['locked']: continue
-        others+=await ev(f"__T.ends({o['id']})")
-      cands=[]
-      for side,e in (('R',r),('L',l)):
-        cx=e['x']+(1 if side=='R' else -1)*(na*BS/2+6);far=e['x']+(1 if side=='R' else -1)*(na*BS+6)
-        if far>vr or far<vl: continue
-        d=min([math.hypot(far-o['x'],e['y']-o['y']) for o in others]+[999])
-        cands.append((d,cx,e['y']))
-      if not cands: cands=[(0,r['x']+na*BS/2+6,r['y'])]
-      _,tx,ty=max(cands)
-      await drag(a['x'],a['y'],tx,ty,hold=450,lift='always');await settle(500);log('  fused?',[(q['n'],round(q['x']),round(q['y'])) for q in await pcs()])
+      zg=await ev("LV.zeroG");vr=min(await ev('vis().x0+vis().w-40'),1100 if not zg else 1200);vl=max(await ev('vis().x0+40'),60)
+      async def plan():
+        oth=[o for o in await pcs() if o['id'] not in (a['id'],bq['id']) and not o['locked'] and not o['sock']]
+        E=await ev(f"__T.ends({bq['id']})");r=max(E,key=lambda e:e['x']);l=min(E,key=lambda e:e['x'])
+        c=[]
+        for sg,e in ((1,r),(-1,l)):
+          lo,hi=sorted([e['x'],e['x']+sg*(na*BS+20)])
+          if hi>vr or lo<vl: continue
+          gap=min([max(o['x']-o['n']*30-hi,lo-(o['x']+o['n']*30)) for o in oth]+[999])
+          c.append((gap,e['x']+sg*(na*BS/2+4),e['y']))
+        return c,oth
+      c,oth=await plan()
+      if not zg and (not c or max(c)[0]<10):
+        def room(x): return min([abs(x-o['x'])-o['n']*30-nb*30 for o in oth]+[999])
+        best=max(range(int(vl+nb*30),int(min(vr,640)),20),key=room)
+        await drag(bq['x'],bq['y'],best,bq['y'],lift='always',ly=150);await settle(400)
+        a=await piece(na);bq=await piece(nb);log('  moved target to',best,room(best))
+        if not a or not bq: FAIL.append('fuse move broke');return
+        c,oth=await plan()
+      if not c: c=[(0,bq['x']+(nb+na)*30+4,bq['y'])]
+      _,tx,ty=max(c)
+      log('  pre-fuse',await ev('LV.pieces.map(p=>[p.n,+(p.fuseCool-T).toFixed(2),p.noFuse||0,p.hist&&p.hist.sib||0,p.id])'),a['id'],bq['id'],round(tx),round(ty))
+      await drag(a['x'],a['y'],tx,ty,hold=450,lift='always');await settle(500);FC[0]+=1;await shot(f'fuse_{FC[0]}');log('  fused?',[(q['n'],round(q['x']),round(q['y'])) for q in await pcs()])
     async def gcut(b):
       g=(await ev("__T.guards()"))[0];y=g['gy']-b*BS;await swipe(g['x']-90,y-4,g['x']+90,y+4)
     async def gundo():

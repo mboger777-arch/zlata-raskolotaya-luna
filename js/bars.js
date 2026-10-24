@@ -69,7 +69,7 @@ function tryFuse(p,st){const L=LV,E=ends(p);let best=null;
   const F=ends(q);
   // соседи в момент захвата не слипаются, пока кусок не отведут и не поднесут снова
   if(st.near&&st.near.has(q.id)){let md=1e9;for(let i=0;i<2;i++)for(let j=0;j<2;j++)md=Math.min(md,Math.hypot(E[i].x-F[j].x,E[i].y-F[j].y));if(md>1.6*BS)st.near.delete(q.id);else continue}
-  for(let i=0;i<2;i++)for(let j=0;j<2;j++){const d=Math.hypot(E[i].x-F[j].x,E[i].y-F[j].y);if(d<.8*BS&&(!best||d<best.d))best={q,d,i,j}}}
+  for(let i=0;i<2;i++)for(let j=0;j<2;j++){const d=Math.hypot(E[i].x-F[j].x,E[i].y-F[j].y);if(d<1.0*BS&&(!best||d<best.d))best={q,d,i,j}}}
  if(!best)return;const q=best.q;
  if(p.n+q.n>L.maxN){if(lim('big',2500)){L.ev.push({e:'big'});SFX.bad();p.fuseCool=T+1;q.fuseCool=T+1;const qq=pos(q),pp=pos(p);if(q.b)q.b.setLinearVelocity(V(Math.sign(qq.x-pp.x||1)*5,-4))}return}
  fuse(p,q,best,st)}
