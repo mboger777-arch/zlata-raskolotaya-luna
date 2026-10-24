@@ -10,7 +10,7 @@
 - Голоса: zlata←yarmarka/nika, pazl←prost/shester, luna←refs/malina, rask←prost/granit, narr←refs/narrator
 
 ## Чеклист
-- [ ] Скелет: репо + Pages, шрифты, planck, инструменты
+- [x] Скелет: репо + Pages, шрифты, planck, инструменты
 - [ ] Арт-листы (GenerateImage) → art/: zlata_front, zlata_act, pazlik, luna, raskol, raskol2, props, ui; фоны bg: title, map, c1..c5, boss, fin, rotate
 - [ ] Вырезка birefnet → assets/, проверка ореола; моргание (eyes/blink)
 - [ ] Движок bars.js + прототип ввода (резать/хватать/сплав/гнездо/возврат)
