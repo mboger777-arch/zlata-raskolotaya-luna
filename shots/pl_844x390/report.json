@@ -1,0 +1,76 @@
+{
+ "fps": 60,
+ "errs": [],
+ "fail": [
+  "no button bake",
+  "no bakery (shards<5)"
+ ],
+ "aud": [
+  [
+   "title",
+   3,
+   []
+  ],
+  [
+   "intro",
+   4,
+   []
+  ],
+  [
+   "map",
+   9,
+   []
+  ],
+  [
+   "boss",
+   5,
+   []
+  ],
+  [
+   "cs_heart",
+   6,
+   []
+  ],
+  [
+   "heart",
+   6,
+   []
+  ],
+  [
+   "fin",
+   2,
+   []
+  ],
+  [
+   "map_end",
+   7,
+   []
+  ]
+ ],
+ "log": [
+  "audit ok title 3 texts 2 heroes",
+  "audit ok intro 4 texts 0 heroes",
+  "cs after next 1",
+  "audit ok map 9 texts 2 heroes",
+  "LEVEL 5 {'scene': 'play', 'arg': 5, 'talk': None, 'cs': None, 'idx': 5, 'cur': 0, 'task': {'vals': [3, '+', 'x', '=', 7], 'ans': 4, 'solved': False}, 'tasks': [False], 'won': False, 'score': None, 'shard': None, 'mark': None}",
+  "audit ok boss 5 texts 3 heroes",
+  "  mistake boss whole7 into shield registered",
+  "  mistake boss 2 short registered",
+  "  mistake armor too deep registered",
+  "  mistake boss frag 3 registered",
+  "  moved target to 180 275.91876507248867",
+  "  pre-fuse [[4, -1.57, 0, 0, 13], [3, -6.33, 0, 0, 14], [5, -41.38, 0, 0, 15]] 15 13 445 478",
+  "  fused? [(4, 191, 548), (3, 666, 548), (5, 445, 496)]",
+  "  retry fuse",
+  "  moved target to 180 276.0093188415467",
+  "  fused during move",
+  "audit ok cs_heart 6 texts 3 heroes",
+  "audit ok heart 6 texts 3 heroes",
+  "  heart miss: piece stays free, retry",
+  "audit ok fin 2 texts 4 heroes",
+  "audit ok map_end 7 texts 2 heroes",
+  "NO BUTTON bake ['n0', 'n1', 'n2', 'n3', 'n4', 'n5', 'home']",
+  "FPS 60 ERR []",
+  "FAILS ['no button bake', 'no bakery (shards<5)']"
+ ]
+}

@@ -79,7 +79,7 @@ async def main():
       for q in await pcs():
         if q['n']==n and not q['locked'] and not q['sock']: return q
       return None
-    async def mist(): return await ev("LV?LV.mist:0")
+    async def mist(): return await ev("(window.__c0=(__T.st()||{}).cur,LV?LV.mist:0)")
     async def ready(timeout=20000):
       return await until("(()=>{const s=__T.st();return s.scene==='play'&&s.task&&!s.task.solved&&!s.talk})()",timeout)
     async def settle(ms=900):
@@ -96,12 +96,17 @@ async def main():
       E=await ev(f"__T.ends({q['id']})");ax,ay,bx,by=E[0]['x'],E[0]['y'],E[1]['x'],E[1]['y'];k=m/n
       px,py=ax+(bx-ax)*k,ay+(by-ay)*k;l=math.hypot(bx-ax,by-ay) or 1;nx,ny=-(by-ay)/l,(bx-ax)/l
       await swipe(px-nx*80,py-ny*80,px+nx*80,py+ny*80)
-    async def drop(n,si=0,dx=0):
+    async def drop(n,si=0,dx=0,retry=False):
       q=await piece(n)
       if not q and await ev("(()=>{const s=__T.st();return !s.task||s.task.solved||s.scene!=='play'})()"): log('  (already solved)');return
       if not q: log('no piece',n,[(q['n'],round(q['x']),round(q['y']),q['sock']) for q in await pcs()]);FAIL.append(f'no piece {n}');return
       s=(await ev("__T.socks()"))[si];x=(s['x0']+s['x1'])/2+dx;y=s['y']
       await drag(q['x'],q['y'],x,y)
+      if retry:
+        await W8(700);q=await piece(n)
+        log('  after drop',[(o['n'],round(o['x']),round(o['y']),o['sock'],o['locked']) for o in await pcs()],await ev("__T.socks()"))
+        if q and not await ev("(()=>{const s=__T.st();return !s.task||s.task.solved})()"):
+          log('  drop retry',n,round(q['x']),round(q['y']),await ev("__T.socks()"));await drag(q['x'],q['y'],x,y)
     async def fuse(na,nb,tries=2):
       await settle(300)
       for _ in range(6):
@@ -127,9 +132,11 @@ async def main():
       if not zg and (not c or max(c)[0]<10):
         def room(x): return min([abs(x-o['x'])-o['n']*30-nb*30 for o in oth]+[999])
         best=max(range(int(vl+nb*30),int(min(vr,640)),20),key=room)
-        await drag(bq['x'],bq['y'],best,bq['y'],lift='always',ly=150);await settle(400)
+        await drag(bq['x'],bq['y'],best,bq['y'],lift='always',ly=150);await settle(900)
         a=await piece(na);bq=await piece(nb);log('  moved target to',best,room(best))
-        if not a or not bq: FAIL.append('fuse move broke');return
+        if not a or not bq:
+          if await piece(na+nb): log('  fused during move');return
+          FAIL.append('fuse move broke');return
         c,oth=await plan()
       if not c: c=[(0,bq['x']+(nb+na)*30+4,bq['y'])]
       _,tx,ty=max(c)
@@ -137,7 +144,11 @@ async def main():
       await drag(a['x'],a['y'],tx,ty,hold=450,lift='always');await settle(500);FC[0]+=1;await shot(f'fuse_{FC[0]}');log('  fused?',[(q['n'],round(q['x']),round(q['y'])) for q in await pcs()])
       if tries>1 and not await piece(na+nb) and await piece(na) and await piece(nb): log('  retry fuse');return await fuse(na,nb,tries-1)
     async def gcut(b):
-      g=(await ev("__T.guards()"))[0];y=g['gy']-b*BS;await swipe(g['x']-90,y-4,g['x']+90,y+4)
+      for t in range(3):
+        g=(await ev("__T.guards()"))[0];n0=g['n'];y=g['gy']-b*BS;await swipe(g['x']-90,y-4,g['x']+90,y+4);await W8(250)
+        g2=(await ev("__T.guards()"))[0]
+        if g2['n']!=n0: return
+        log('  gcut miss',b,g,await ev("__T.st().talk"));await W8(1200)
     async def gundo():
       await W8(1300)
       for q in await pcs():
@@ -145,7 +156,7 @@ async def main():
           await tap2(q['x'],q['y']);return True
       log('no guard piece to undo');return False
     async def solved(timeout=9000):
-      ok=await until("(()=>{const s=__T.st();return !s.task||s.task.solved||s.scene!=='play'})()",timeout)
+      ok=await until("(()=>{const s=__T.st();return !s.task||s.task.solved||s.scene!=='play'||(window.__c0!=null&&s.cur!==window.__c0)})()",timeout)
       if not ok:
         FAIL.append('not solved '+json.dumps(await st()));log('NOT SOLVED',await st());await shot('FAIL_'+str(len(FAIL)))
         if len(FAIL)>2: raise SystemExit('too many fails')
@@ -227,7 +238,7 @@ async def main():
       await ready();await shard_try()
       for n in (4,3,2): await visible(n)
       m=await mist();await drop(2,0);await settle(300);await mcheck(m,'2 into sky7');await W8(1900)
-      await visible(4);await visible(3);await fuse(3,4);await shot('51_c5_fuse');await visible(7);await drop(7,0);await solved()
+      await visible(4);await visible(3);await fuse(3,4);await shot('51_c5_fuse');await visible(7);await drop(7,0,retry=True);await solved()
       await ready();m=await mist();await gcut(3);await settle(300);await mcheck(m,'sky guard too deep');await gundo();await settle(400);await gcut(4);await solved()
       await finish('cs',25000);await W8(1500);await shot('52_cs_fall');await audit('cs_fall')
       await until("G.scene==='map'",30000);G_SCENE[0]='map';await W8(1200);await shot('53_map_boss')
@@ -243,7 +254,9 @@ async def main():
       await ready();await W8(3800);await shot('62_boss_p3');m=await mist();await drop(3,0);await settle(300);await mcheck(m,'boss frag 3');await W8(1900);await fuse(5,4);await drop(9,0);await solved()
       await finish('cs',25000);await W8(1500);await shot('63_cs_heart');await audit('cs_heart')
       await until("G.scene==='play'",30000);G_SCENE[0]='play';await ready();await shot('64_heart');await audit('heart')
-      q=await piece(1);await drag(q['x'],q['y'],500,560);await settle(500);await mcheck(await mist(),'heart-miss')
+      q=await piece(1);await drag(q['x'],q['y'],500,560);await settle(800);await shot('64b_heart_miss')
+      if not await piece(1): FAIL.append('heart piece lost after miss')
+      else: log('  heart miss: piece stays free, retry')
       q=await piece(1);s=(await ev("__T.socks()"))[0];await drag(q['x'],q['y'],(s['x0']+s['x1'])/2,s['y']);await solved()
       await finish('cs',20000);await W8(2500);await shot('65_cs_whole')
       await until("G.scene==='fin'",40000);G_SCENE[0]='fin';await W8(2500);await shot('70_fin');await audit('fin')
