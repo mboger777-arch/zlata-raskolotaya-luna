@@ -2,7 +2,7 @@
 import asyncio,sys,json
 from playwright.async_api import async_playwright
 HOOK="""(()=>{window.__AU=[];const P=HTMLMediaElement.prototype;const op=P.play,pa=P.pause;
-P.play=function(){const r={src:this.src.split('/').pop(),t0:performance.now(),end:null,cut:null,dur:null};__AU.push(r);this.__r=r;
+P.play=function(){const r={src:this.src.split('/').pop().split('?')[0],t0:performance.now(),end:null,cut:null,dur:null};__AU.push(r);this.__r=r;
  this.addEventListener('ended',()=>{r.end=performance.now()},{once:true});this.addEventListener('loadedmetadata',()=>{r.dur=this.duration});return op.apply(this,arguments)};
 P.pause=function(){if(this.__r&&!this.__r.end&&!this.ended&&this.src.includes('/voice/'))this.__r.cut={at:this.currentTime,dur:this.duration};return pa.apply(this,arguments)}})()"""
 async def main():
