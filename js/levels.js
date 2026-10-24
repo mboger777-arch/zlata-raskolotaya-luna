@@ -89,7 +89,7 @@ LEVELS[1]=()=>{const L=mkLevel(1,{gy:430,zx:150,zh:300,ph:140,grounds:[[-600,440
  run(async()=>{await wait(500);await say('c2_s');await say('c2_r');await runTasks();await winLevel()})};
 async function bridgeRun(){const L=LV;const z0=L.zx;L.running=T;SFX.whoosh&&SFX.whoosh();for(let i=0;i<=24;i++){L.zx=lerp(z0,1500,ease(i/24));await wait(40)}L.running=0;L.zx=-300;await wait(150);for(let i=0;i<=12;i++){L.zx=lerp(-300,z0,ease(i/12));await wait(40)}L.zx=z0}
 // ---- глава 3: Звездопадные ворота (x − a = b) ----
-async function dropParts(ns){const L=LV;let x=340;for(const [n,h] of ns){if(L.task&&L.task.solved)return;newPiece(n,x+rnd(-15,15),-60,{hue:h,vx:rnd(-.6,.6),av:rnd(-.6,.6)});SFX.whoosh&&SFX.whoosh();x+=100;await wait(900)}}
+async function dropParts(ns){const L=LV;let x=250;for(const [n,h] of ns){if(L.task&&L.task.solved)return;newPiece(n,x+rnd(-15,15),-60,{hue:h,vx:rnd(-.6,.6),av:rnd(-.6,.6)});SFX.whoosh&&SFX.whoosh();x+=230;await wait(900)}}
 function gateTask(L,parts){sock({cx:950,cy:350,n:parts[0][0]+parts[1][0],kind:'key',noDots:1,q:1,dy:50});run(()=>dropParts(parts))}
 LEVELS[2]=()=>{const L=mkLevel(2,{gy:590,zx:150,zh:320,ph:150,grounds:[[-600,1900,590]],recover:{x:640,y:120},shardTask:1});
  L.tasks=[

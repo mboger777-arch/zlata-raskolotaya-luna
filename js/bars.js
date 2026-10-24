@@ -44,7 +44,7 @@ function barsInput(){const L=LV;if(!L||L.frozen){TAPS=[];return}
  for(const t of TAPS){const pr=PTR.get(t.id);if(!pr||pr.own)continue;let tmp=null;for(const s of L.sockets)if(s.temp){const q=s.temp.p;if(Math.abs(t.x-q.x)<q.n*BS/2+20&&Math.abs(t.y-q.y)<BS)tmp=q}
   if(tmp){pr.own='ui';ejectTemp(tmp);continue}
   const p=hitPiece(t.x,t.y);
-  if(p){pr.own='piece';const q=pos(p);const st={kind:'piece',p,ox:q.x-t.x,oy:q.y-t.y,t0:T,x0:t.x,y0:t.y,moved:0};L.ptr.set(t.id,st);p.held=t.id;for(const s of L.sockets)delete s.cool[p.id];p.cool=0;p.fuseCool=Math.max(p.fuseCool,T+.15);if(p.b)p.b.setGravityScale(0);L.act=T;SFX.click()}
+  if(p){pr.own='piece';const q=pos(p);const st={kind:'piece',p,ox:q.x-t.x,oy:q.y-t.y,t0:T,x0:t.x,y0:t.y,moved:0};st.near=new Set();{const E=ends(p);for(const o of L.pieces){if(o===p||o.dead||o.locked)continue;const F=ends(o);for(let i=0;i<2;i++)for(let j=0;j<2;j++)if(Math.hypot(E[i].x-F[j].x,E[i].y-F[j].y)<1.6*BS)st.near.add(o.id)}}L.ptr.set(t.id,st);p.held=t.id;for(const s of L.sockets)delete s.cool[p.id];p.cool=0;p.fuseCool=Math.max(p.fuseCool,T+.15);if(p.b)p.b.setGravityScale(0);L.act=T;SFX.click()}
   else{pr.own='blade';L.ptr.set(t.id,{kind:'blade',pts:[[t.x,t.y,T]],cut:new Set(),t0:T})}}
  TAPS=[];
  for(const [id,st] of L.ptr){const pr=PTR.get(id);
@@ -66,7 +66,9 @@ function heldStep(dt){const L=LV;for(const [,st] of L.ptr){if(st.kind!=='piece'|
   if(T>p.fuseCool&&st.moved>40)tryFuse(p,st)}}
 function tryFuse(p,st){const L=LV,E=ends(p);let best=null;
  for(const q of L.pieces){if(q===p||q.locked||q.sock||q.dead||q.guardPart||T<q.fuseCool||q.noFuse||p.noFuse)continue;if((p.hist&&p.hist.sib===q.id)||(q.hist&&q.hist.sib===p.id))continue;// братья по разрезу не слипаются (для этого двойной тап)
-const F=ends(q);
+  const F=ends(q);
+  // соседи в момент захвата не слипаются, пока кусок не отведут и не поднесут снова
+  if(st.near&&st.near.has(q.id)){let md=1e9;for(let i=0;i<2;i++)for(let j=0;j<2;j++)md=Math.min(md,Math.hypot(E[i].x-F[j].x,E[i].y-F[j].y));if(md>1.6*BS)st.near.delete(q.id);else continue}
   for(let i=0;i<2;i++)for(let j=0;j<2;j++){const d=Math.hypot(E[i].x-F[j].x,E[i].y-F[j].y);if(d<.8*BS&&(!best||d<best.d))best={q,d,i,j}}}
  if(!best)return;const q=best.q;
  if(p.n+q.n>L.maxN){if(lim('big',2500)){L.ev.push({e:'big'});SFX.bad();p.fuseCool=T+1;q.fuseCool=T+1;const qq=pos(q),pp=pos(p);if(q.b)q.b.setLinearVelocity(V(Math.sign(qq.x-pp.x||1)*5,-4))}return}
