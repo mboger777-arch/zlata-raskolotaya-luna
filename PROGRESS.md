@@ -25,7 +25,7 @@
 - [ ] Реплики → голоса + ASR + проверка ударений
   - [x] tools/lines.py (96 реплик) → tools/lines.json, js/lines.js
   - [x] voicegen.py: REF zlata/pazl/luna/rask/narr, префикс z303; запуск: cd /workspace/lesson303 && nice -n 15 /home/box/tts/qw/bin/python tools/voicegen.py > /tmp/vg303.log (после вырезки!)
-  - [~] генерация идёт (/tmp/vg303.log, перезапущена после OOM; дописывает недостающие) · [ ] ударения (Злата, Раскол, Пазлик, отсеки, сплавь...) · [ ] voicecheck
+  - [x] генерация 96/96 (VOICEDONE) · [ ] ударения (Злата, Раскол, Пазлик, отсеки, сплавь...) · [ ] voicecheck
 - [ ] tools/play303.py — полный проход реальными жестами (пишется)
 - [ ] Тесты 844x390, 667x375, 932x430 (ошибка+исправление на каждом задании, аудит, fps, 0 ошибок); voicecheck
 - [ ] Публикация ?v=, проверка живого URL
