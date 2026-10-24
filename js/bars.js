@@ -11,7 +11,8 @@ function newWorld(o){
  LV=L;
  w.on('pre-solve',c=>{const a=c.getFixtureA().getBody().getUserData(),b=c.getFixtureB().getBody().getUserData();
   if((a&&a.held)||(b&&b.held))c.setEnabled(false);// удерживаемый кусок проходит сквозь всё
-  if(a&&b&&a.ghost>T||b&&a&&b.ghost>T)c.setEnabled(false)});
+  if(a&&b&&a.ghost>T||b&&a&&b.ghost>T)c.setEnabled(false);
+  if(a&&a.phase||b&&b.phase)c.setEnabled(false)});// падающие сверху части проходят сквозь всё
  for(const g of L.grounds)mkGround(g);
  if(L.cradle)mkCradle(L.cradle);
  return L}
@@ -41,7 +42,7 @@ function hitPiece(x,y){let best=null,bd=1e9;for(const p of LV.pieces){if(p.locke
 const wrapA=a=>{while(a>Math.PI)a-=2*Math.PI;while(a<-Math.PI)a+=2*Math.PI;return a};
 // ---------- ввод ----------
 function barsInput(){const L=LV;if(!L||L.frozen){TAPS=[];return}
- for(const t of TAPS){const pr=PTR.get(t.id);if(!pr||pr.own)continue;let tmp=null;for(const s of L.sockets)if(s.temp){const q=s.temp.p;if(Math.abs(t.x-q.x)<q.n*BS/2+20&&Math.abs(t.y-q.y)<BS)tmp=q}
+ for(const t of TAPS){const pr=PTR.get(t.id);if(!pr||pr.own)continue;if(L.grab&&L.grab(t,pr))continue;let tmp=null;for(const s of L.sockets)if(s.temp){const q=s.temp.p;if(Math.abs(t.x-q.x)<q.n*BS/2+20&&Math.abs(t.y-q.y)<BS)tmp=q}
   if(tmp){pr.own='ui';ejectTemp(tmp);continue}
   const p=hitPiece(t.x,t.y);
   if(p){pr.own='piece';const q=pos(p);const st={kind:'piece',p,ox:q.x-t.x,oy:q.y-t.y,t0:T,x0:t.x,y0:t.y,moved:0};st.near=new Set();{const E=ends(p);for(const o of L.pieces){if(o===p||o.dead||o.locked)continue;const F=ends(o);for(let i=0;i<2;i++)for(let j=0;j<2;j++)if(Math.hypot(E[i].x-F[j].x,E[i].y-F[j].y)<1.6*BS)st.near.add(o.id)}}L.ptr.set(t.id,st);p.held=t.id;for(const s of L.sockets)delete s.cool[p.id];p.cool=0;p.fuseCool=Math.max(p.fuseCool,T+.15);if(p.b)p.b.setGravityScale(0);L.act=T;SFX.click()}
@@ -147,7 +148,7 @@ function socketStep(){const L=LV;
  for(const s of L.sockets){if(s.fill||s.off)continue;const R=sockRect(s);
   if(s.temp){const tp=s.temp;if(T-tp.t0>1.5){// выталкиваем короткий
     const p=tp.p;s.temp=null;p.sock=null;mkBody(p,p.x/BS,(s.cy-70)/BS,0,rnd(-1,1),-8,rnd(-2,2));p.cool=T+1.2;s.cool[p.id]=1e9}continue}
-  for(const p of L.pieces){if(p.held!=null||p.locked||p.sock||p.dead||!p.b||T<p.cool||(s.cool[p.id]||0)>T)continue;const q=pos(p);
+  for(const p of L.pieces){if(p.phase||p.held!=null||p.locked||p.sock||p.dead||!p.b||T<p.cool||(s.cool[p.id]||0)>T)continue;const q=pos(p);
    const w=R.x1-R.x0,cx=(R.x0+R.x1)/2;if(Math.abs(q.x-cx)>w/2+BS*.9||Math.abs(q.y-R.y)>(s.dy||BS))continue;
    // нужна примерно горизонтальная ориентация или вертикальный кусок низко
    if(s.accept&&!s.accept(p))continue;

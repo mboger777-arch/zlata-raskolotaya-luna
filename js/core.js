@@ -118,7 +118,7 @@ function safeL(){return vis().x0+SAFE.l/S+14}function safeR(){return vis().x0+vi
 function safeT(){return vis().y0+SAFE.t/S+8}function safeB(){return vis().y0+vis().h-SAFE.b/S-6}
 // фон «cover» на весь экран, без полос
 function bgCover(n,ox,oy,zoom){const v=vis(),b=IM['bg_'+n];if(!okI(b)){X.fillStyle='#2b1d3a';X.fillRect(v.x0,v.y0,v.w,v.h);return}
- const s=Math.max(v.w/b.naturalWidth,v.h/b.naturalHeight)*(zoom||1);const w=b.naturalWidth*s,h=b.naturalHeight*s;X.drawImage(b,v.x0+(v.w-w)/2+(ox||0),v.y0+(v.h-h)/2+(oy||0),w,h)}
+ const s=Math.max(v.w/b.naturalWidth,v.h/b.naturalHeight)*(zoom||1);const w=b.naturalWidth*s,h=b.naturalHeight*s;const x0=v.x0+(v.w-w)/2+(ox||0),y0=v.y0+(v.h-h)/2+(oy||0);X.drawImage(b,x0,y0,w,h);G.bgm={n,x0,y0,s:w/1280}}
 function dim(a){const v=vis();X.fillStyle=`rgba(10,8,30,${a})`;X.fillRect(v.x0,v.y0,v.w,v.h)}
 // ---- текст: всё вписывается в свой предмет ----
 function wrap(t,maxW){const ws=String(t).split(' '),out=[];let cur='';for(const w of ws){const s=cur?cur+' '+w:w;if(X.measureText(s).width>maxW&&cur){out.push(cur);cur=w}else cur=s}if(cur)out.push(cur);return out}
