@@ -11,8 +11,8 @@
 
 ## Чеклист
 - [x] Скелет: репо + Pages, шрифты, planck, инструменты
-- [ ] Арт-листы → art/: [x] zlata_front(idle,talk,cheer) [x] zlata_act(slash,push,oops,heart) [x] pazlik(idle,wave,jump,scared) [x] luna(idle,talk,weak) [x] raskol(proud,attack,kneel) [x] raskol2(kind,gift) [x] creatures(guard,guard_ok,whale) [x] items(shard,medal,pie,cake,lantern,moonfrag) [x] ui(plaque,round,socket)
-  - [ ] фоны bg: title, map, c1 кузница, c2 мост, c3 ворота, c4 долина, c5 ночное небо, boss, fin, rotate(9:16); катсцены cs_crack, cs_fall, cs_heart, cs_whole
+- [x] Арт-листы → art/: [x] zlata_front(idle,talk,cheer) [x] zlata_act(slash,push,oops,heart) [x] pazlik(idle,wave,jump,scared) [x] luna(idle,talk,weak) [x] raskol(proud,attack,kneel) [x] raskol2(kind,gift) [x] creatures(guard,guard_ok,whale) [x] items(shard,medal,pie,cake,lantern,moonfrag) [x] ui(plaque,round,socket)
+  - [x] фоны bg: title, map, c1 кузница, c2 мост, c3 ворота, c4 долина, c5 ночное небо, boss, fin, rotate(9:16); катсцены cs_crack, cs_fall, cs_heart, cs_whole
 - [ ] Вырезка birefnet → assets/, проверка ореола; моргание (eyes/blink)
 - [ ] Движок bars.js + прототип ввода (резать/хватать/сплав/гнездо/возврат)
 - [ ] scenes.js: лоадер, титул, интро, карта, HUD (табло уравнения), катсцены, финал, поворот, цикл, window.__T
@@ -24,3 +24,4 @@
 - [ ] Публикация ?v=, проверка живого URL
 
 ## Журнал
+- арт: все листы/фоны/катсцены в art/ (cs_heart, cs_whole перерисованы с правильным Пазликом). Луна в bg_c4 не треснута — допустимо.
