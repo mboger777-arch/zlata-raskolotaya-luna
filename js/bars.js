@@ -44,7 +44,7 @@ function barsInput(){const L=LV;if(!L||L.frozen){TAPS=[];return}
  for(const t of TAPS){const pr=PTR.get(t.id);if(!pr||pr.own)continue;let tmp=null;for(const s of L.sockets)if(s.temp){const q=s.temp.p;if(Math.abs(t.x-q.x)<q.n*BS/2+20&&Math.abs(t.y-q.y)<BS)tmp=q}
   if(tmp){pr.own='ui';ejectTemp(tmp);continue}
   const p=hitPiece(t.x,t.y);
-  if(p){pr.own='piece';const q=pos(p);const st={kind:'piece',p,ox:q.x-t.x,oy:q.y-t.y,t0:T,x0:t.x,y0:t.y,moved:0};L.ptr.set(t.id,st);p.held=t.id;p.fuseCool=Math.max(p.fuseCool,T+.15);if(p.b)p.b.setGravityScale(0);L.act=T;SFX.click()}
+  if(p){pr.own='piece';const q=pos(p);const st={kind:'piece',p,ox:q.x-t.x,oy:q.y-t.y,t0:T,x0:t.x,y0:t.y,moved:0};L.ptr.set(t.id,st);p.held=t.id;for(const s of L.sockets)delete s.cool[p.id];p.cool=0;p.fuseCool=Math.max(p.fuseCool,T+.15);if(p.b)p.b.setGravityScale(0);L.act=T;SFX.click()}
   else{pr.own='blade';L.ptr.set(t.id,{kind:'blade',pts:[[t.x,t.y,T]],cut:new Set(),t0:T})}}
  TAPS=[];
  for(const [id,st] of L.ptr){const pr=PTR.get(id);
@@ -143,14 +143,14 @@ function sockRect(s){// пустая область
 function socketStep(){const L=LV;
  for(const s of L.sockets){if(s.fill||s.off)continue;const R=sockRect(s);
   if(s.temp){const tp=s.temp;if(T-tp.t0>1.5){// выталкиваем короткий
-    const p=tp.p;s.temp=null;p.sock=null;mkBody(p,p.x/BS,(s.cy-70)/BS,0,rnd(-1,1),-8,rnd(-2,2));p.cool=T+1.2;s.cool[p.id]=T+1.2}continue}
+    const p=tp.p;s.temp=null;p.sock=null;mkBody(p,p.x/BS,(s.cy-70)/BS,0,rnd(-1,1),-8,rnd(-2,2));p.cool=T+1.2;s.cool[p.id]=1e9}continue}
   for(const p of L.pieces){if(p.held!=null||p.locked||p.sock||p.dead||!p.b||T<p.cool||(s.cool[p.id]||0)>T)continue;const q=pos(p);
-   const w=R.x1-R.x0,cx=(R.x0+R.x1)/2;if(Math.abs(q.x-cx)>w/2+BS*.9||Math.abs(q.y-R.y)>BS*1.0)continue;
+   const w=R.x1-R.x0,cx=(R.x0+R.x1)/2;if(Math.abs(q.x-cx)>w/2+BS*.9||Math.abs(q.y-R.y)>(s.dy||BS))continue;
    // нужна примерно горизонтальная ориентация или вертикальный кусок низко
    if(s.accept&&!s.accept(p))continue;
    const need=s.need;
    if(p.n===need){lockIn(p,s,R);break}
-   else if(p.n>need){const v=p.b.getLinearVelocity();p.b.setLinearVelocity(V(q.x<cx?-5:5,-9));p.b.setAngularVelocity(rnd(-3,3));s.cool[p.id]=T+1.1;p.cool=T+.6;s.rej=T;L.mist++;SFX.bad();vib([20,30,20]);L.ev.push({e:'long',s,p});setPose('z_oops',.9);burst(q.x,q.y,10,'spark',0,.4)}
+   else if(p.n>need){const v=p.b.getLinearVelocity();p.b.setLinearVelocity(V(q.x<cx?-5:5,-9));p.b.setAngularVelocity(rnd(-3,3));s.cool[p.id]=1e9;p.cool=T+.6;s.rej=T;L.mist++;SFX.bad();vib([20,30,20]);L.ev.push({e:'long',s,p});setPose('z_oops',.9);burst(q.x,q.y,10,'spark',0,.4)}
    else{s.temp={p,t0:T};p.sock=s;killBody(p);const x=s.fixed.some(f=>f.at==='R')?R.x1-p.n*BS/2:R.x0+p.n*BS/2;p.x=x;p.y=R.y;p.ang=0;s.rej=T;L.mist++;SFX.bad();L.ev.push({e:'short',s,p});setPose('z_oops',.9);break}}}}
 function lockIn(p,s,R){const L=LV;const q=pos(p);killBody(p);p.locked=true;p.sock=s;s.fill=p;p.sx=q.x;p.sy=q.y;p.sa=wrapA(q.a);
  if(Math.abs(p.sa)>Math.PI/2){p.sa=wrapA(p.sa-Math.PI);p.cols=p.cols.slice().reverse()}
@@ -171,7 +171,7 @@ function barsStep(dt){const L=LV;if(!L)return;syncWalls();heldStep(dt);
  for(const p of L.pieces.slice()){if(!p.b)continue;const q=pos(p);
   if(L.wrap){if(q.x<v.x0-p.n*BS/2-40){p.b.setPosition(V((v.x0+v.w+p.n*BS/2+30)/BS,p.b.getPosition().y));L.ev.push({e:'wrap',p})}
    if(q.y<v.y0+30)p.b.applyForceToCenter(V(0,6*p.b.getMass()),true);if(q.y>v.y0+v.h-30)p.b.applyForceToCenter(V(0,-6*p.b.getMass()),true)}
-  if(q.y>L.killY||q.x<v.x0-400||q.x>v.x0+v.w+400){if(L.onLost&&L.onLost(p))continue;const r=L.recover;p.b.setPosition(V(r.x/BS,r.y/BS));p.b.setLinearVelocity(V(0,1));p.b.setAngularVelocity(0);p.b.setAngle(0);p.ghost=T+.4;L.pz.hop=T;burst(r.x,r.y,24,'spark',200,.7);SFX.pop&&SFX.pop();L.ev.push({e:'fall'})}}}
+  if(q.y>L.killY||q.x<v.x0-400||q.x>v.x0+v.w+400){if(L.onLost&&L.onLost(p))continue;const r=L.recover;p.b.setPosition(V(r.x/BS,r.y/BS));p.b.setLinearVelocity(V(0,1));p.b.setAngularVelocity(0);p.b.setAngle(0);p.ghost=T+.4;L.pz.hop=T;burst(r.x,r.y,24,'spark',200,.7);SFX.pop();L.ev.push({e:'fall'})}}}
 function setPose(n,d){if(LV)LV.pose={n,until:T+d}}
 // ---------- рисование ----------
 function drawBar(x,y,a,n,cols,o){o=o||{};const L=n*BS,h=BS*BH;X.save();X.translate(x,y);X.rotate(a);if(o.alpha!=null)X.globalAlpha*=o.alpha;
@@ -203,7 +203,8 @@ function drawSocket(s){const R=sockRect(s);const L0=s.cx-s.n*BS/2,h=BS*BH+14;X.s
  X.lineWidth=4;X.strokeStyle=s.fill?'#ffe680':'rgba(190,215,255,.95)';X.stroke();
  // пустые ячейки
  if(!s.fill){X.setLineDash([8,7]);X.strokeStyle=`rgba(255,240,170,${.55+.35*Math.sin(T*4)})`;X.lineWidth=3;rr(R.x0+4,s.cy-h/2+7,R.x1-R.x0-8,h-14,(h-14)/2);X.stroke();X.setLineDash([]);
-  if(!s.fog){X.fillStyle='rgba(255,240,170,.25)';for(let i=0;i<s.need;i++){X.beginPath();X.arc(R.x0+BS/2+i*BS,s.cy,BS*.12,0,7);X.fill()}}}
+  if(s.q&&!s.fog)txt('?',(R.x0+R.x1)/2,s.cy-BS*.95,56,'#fff3a0',{f:NUM,st:'#1a0f3a',lw:10,id:'sq',kind:'num'});
+  if(!s.fog&&!s.noDots){X.fillStyle='rgba(255,240,170,.25)';for(let i=0;i<s.need;i++){X.beginPath();X.arc(R.x0+BS/2+i*BS,s.cy,BS*.12,0,7);X.fill()}}}
  X.restore();
  // неподвижные части
  let x=L0;for(const f of s.fixed.filter(f=>f.at==='L')){drawBar(x+f.n*BS/2,s.cy,0,f.n,f.cols||Array(f.n).fill(HUE.blue),{});if(!s.hideFixNum)numTag(f.n,x+f.n*BS/2,s.cy-BS*.95,48,{id:'fixnum'});x+=f.n*BS}
