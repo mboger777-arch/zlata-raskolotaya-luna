@@ -20,6 +20,7 @@ function hero(n,x,gy,h,o){o=o||{};const br=o.still?1:1+.012*Math.sin(T*2.4+(o.ph
  if(!o.noSh){const sy=o.shY==null?gy:o.shY,k=o.air?.55:1;X.save();X.globalAlpha=(o.a==null?1:o.a)*.38*k;X.fillStyle='#0a0618';X.beginPath();X.ellipse(x,sy-2,h*ar*.3*k,h*.028,0,0,7);X.fill();X.restore()}
  spr(n,x,gy,hh,{ax:.5,ay:1,flip:o.flip,blink:BLINKS.includes(n)?(o.seed||5):0,a:o.a});
  if(HEARTP[n]&&pzHeart()){const q=HEARTP[n];const w=hh*ar;glowHeart(x+(q[0]-.5)*w*(o.flip?-1:1),gy-hh*(1-q[1]),hh*q[2],o.a)}
+ if(G.feetMon&&!AUD){const f=feetOK(x,gy,o||{});if(f==='BAD'){const key=n+'@'+G.scene+(LV?LV.idx:'');G.feetBad[key]=(G.feetBad[key]||0)+1}}
  if(AUD){const m=X.getTransform(),k=m.a/DPR;G.heroes.push({n,x:(m.e/DPR)+x*k,w:hh*ar*k,h:hh*k,ar,feet:(m.f/DPR)+gy*k,fl:feetOK(x,gy,o),sc:G.scene})}}
 // сердечко Пазлика (дыра в груди на спрайтах: центр x/w, y/h, ширина/h)
 const HEARTP={p_wave:[.49,.528,.15],p_jump:[.495,.54,.155],p_idle:[.552,.532,.152]};

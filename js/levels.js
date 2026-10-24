@@ -167,10 +167,10 @@ LEVELS[1]=()=>{const L=mkLevel(1,{gy:470,zx:-240,zh:300,ph:140,pzBehind:1,ground
  run(async()=>{await wait(500);await say('c2_s');await say('c2_r');await runTasks();await winLevel()})};
 // ---- глава 3: Звездопадные ворота (x − a = b): лови части корзинкой, склей ключ ----
 const LOCKY=[300,400,500];
-LEVELS[2]=()=>{const L=mkLevel(2,{gy:645,zx:150,zh:320,ph:150,grounds:[[-600,1900,645]],cradle:{x0:360,x1:1040,y:300},recover:{x:700,y:200},shardTask:1,locks:[0,0,0]});
+LEVELS[2]=()=>{const L=mkLevel(2,{gy:645,zx:150,zh:320,ph:150,grounds:[[-600,1900,645]],cradle:{x0:320,x1:1100,y:300},recover:{x:700,y:200},shardTask:1,locks:[0,0,0]});
  const bkMin=()=>Math.max(L.zx,safeL()+L.zh*.2)+L.zh*.42+L.ph*.4+130,bkMax=()=>Math.min(safeR()-130,imgP(1006,0).x-170);
  const gate=(parts,o)=>{o=o||{};const sum=parts.filter(p=>!p[2]).reduce((a,p)=>a+p[0],0);const s=sock({cx:680,cy:430,n:sum,kind:'key',noDots:1,q:1,dy:55});
-  L.bk=L.bk||{x:(bkMin()+bkMax())/2,w:240,h:96,stun:0};L.drop=parts.map(p=>({n:p[0],h:p[1],decoy:!!p[2]}));L.nextDrop=T+.4;L.benchX=380;L.rain=o.rain?{next:T+2,done:0}:null;return s};
+  L.bk=L.bk||{x:(bkMin()+bkMax())/2,w:240,h:96,stun:0};L.drop=parts.map(p=>({n:p[0],h:p[1],decoy:!!p[2]}));L.nextDrop=T+.4;L.benchX=340;L.rain=o.rain?{next:T+2,done:0}:null;return s};
  const S=()=>L.sockets[0];const cap='x — каким было целое';
  const G3=(vals,ans,a,b,parts,t,k,o,i)=>({vals,ans,t,k,gk:'basket',cap,hi:'g_long',chk:[`x = ${b} + ${a} = ${ans}`,`${ans} − ${a} = ${b}`],setup(){gate(parts,o)},
   guide(){const f=L.falling.find(f=>!f.decoy&&!f.dead);if(f&&L.bk){const q=pos(f),y=645-L.bk.h/2;if(Math.abs(q.x-L.bk.x)<40)return null;return{type:'drag',f:{x:L.bk.x,y},t:{x:clamp(q.x,bkMin(),bkMax()),y}}}return gFill(S())},
@@ -180,14 +180,14 @@ LEVELS[2]=()=>{const L=mkLevel(2,{gy:645,zx:150,zh:320,ph:150,grounds:[[-600,190
   Object.assign(G3(['x','−',5,'=',3],8,5,3,[[3,HUE.gold],[5,HUE.blue]],'c3_t3','c3_k3',{rain:1},2),{after:async()=>{L.gateOpen=T;SFX.quake&&SFX.quake();addShake(.4);L.walkV=200;L.walkTo=Math.min(560,imgP(1006,0).x-420);await wait(1600);
     L.rask={t0:T,out:0};SFX.crack();addShake(.5);await wait(700);await say('c3_r1');await say('c3_r2');L.rask.out=T;await wait(800);L.rask=null}})];
  // корзинку двигают пальцем
- L.grab=(t,pr)=>{const b=L.bk;if(!b||!L.task||L.task.solved)return false;if(Math.abs(t.x-b.x)<b.w/2+40&&t.y>645-b.h-70&&t.y<660){pr.own='bk';L.bkId=t.id;L.act=T;SFX.click();return true}return false};
+ L.grab=(t,pr)=>{const b=L.bk;if(!b||!L.task||L.task.solved)return false;for(const p of L.pieces){if(p.dead||p.locked||p.phase)continue;const q=pos(p);if(Math.abs(q.x-t.x)<p.n*BS/2+10&&Math.abs(q.y-t.y)<45)return false}if(Math.abs(t.x-b.x)<b.w/2+40&&t.y>645-b.h-70&&t.y<660){pr.own='bk';L.bkId=t.id;L.act=T;SFX.click();return true}return false};
  L.step=dt=>{const b=L.bk;if(!b)return;const pr=L.bkId!=null&&PTR.get(L.bkId);if(pr)b.tx=pr.x;else L.bkId=null;if(b.tx!=null)b.x+=(clamp(b.tx,bkMin(),bkMax())-b.x)*Math.min(1,dt*14);b.x=clamp(b.x,bkMin(),bkMax());
   const t=L.task;if(!t||t.solved)return;const v=vis(),mouth=645-b.h;
   // сброс частей ключа сверху — по одной
   if(L.drop&&L.drop.length&&!L.falling.length&&T>L.nextDrop&&!talk){const d=L.drop.shift();const x=rnd(bkMin(),bkMax());const p=newPiece(d.n,x,v.y0-50,{hue:d.h,noGrab:1,noCut:1,phase:1,decoy:d.decoy});p.b.setGravityScale(.22);p.b.setLinearDamping(2);p.b.setAngularVelocity(0);p.b.setFixedRotation(true);p.dd=d;L.falling.push(p);SFX.whoosh()}
   for(const f of L.falling.slice()){if(f.dead){L.falling.splice(L.falling.indexOf(f),1);continue}const q=pos(f);if(f.b)f.b.setAngle(Math.sin(T*2+f.id)*.08);
    if(q.y>mouth-30&&q.y<mouth+25&&Math.abs(q.x-b.x)<b.w/2+12&&!(b.stun>T)){// поймали
-    killPiece(f);L.falling.splice(L.falling.indexOf(f),1);SFX.fuse();burst(q.x,mouth,22,'spark',f.cols[0],.7);b.hop=T;L.act=T;const sx=L.benchX+f.n*BS/2;L.benchX+=f.n*BS+24;
+    killPiece(f);L.falling.splice(L.falling.indexOf(f),1);SFX.fuse();burst(q.x,mouth,22,'spark',f.cols[0],.7);b.hop=T;L.act=T;const sx=L.benchX+f.n*BS/2;L.benchX+=f.n*BS+100;
     const cols=f.cols,n=f.n,dec=f.decoy;L.fly.push({n,cols,x0:q.x,y0:mouth,x1:sx,y1:268,t0:T,dur:.55,end(){if(LV===L&&L.task===t){const np=newPiece(n,sx,268,{cols});np.decoy=dec;np.flash=T}}});L.nextDrop=T+.9}
    else if(q.y>mouth+40){killPiece(f);L.falling.splice(L.falling.indexOf(f),1);burst(q.x,q.y,16,'spark',f.cols[0],.5);SFX.bad();if(!f.decoy){L.drop.push(f.dd);hint('c3_miss',8)}L.nextDrop=T+1.4}}
   // тёмные осколки
@@ -224,19 +224,23 @@ LEVELS[3]=()=>{const L=mkLevel(3,{gy:635,zx:150,zh:320,ph:150,grounds:[[-600,190
   // ракушка: 7 − x = 5 — часть бусин спрятана, положи под ракушку столько же
   {vals:[7,'−','x','=',5],ans:2,t:'c4_t2',k:'c4_k2',gk:'shell',lo:'c4_lo',hi:'c4_hi',cap:'x — сколько под ракушкой',chk:['x = 7 − 5 = 2','7 − 2 = 5'],
    setup(){const g=addGuard({x:1010,gy:L.gy,n:5,b:null,cols:Array(5).fill(HUE.violet),walk:0,side:1});g.noCut=1;L.shell={s:sock({cx:720,cy:603,n:2,kind:'shell',noDots:1,q:1,dy:80}),open:1};
-    setCradle({x0:380,x1:900,y:360});newPiece(1,440,330,{hue:HUE.gold});newPiece(3,600,330,{hue:HUE.teal});newPiece(2,800,330,{hue:HUE.pink})},
+    setCradle({x0:380,x1:900,y:360});newPiece(1,440,330,{hue:HUE.gold,noFuse:1});newPiece(3,620,330,{hue:HUE.teal,noFuse:1});newPiece(2,820,330,{hue:HUE.pink,noFuse:1})},
    guide:()=>gFill(L.shell.s),count:()=>cellPts(L.shell.s),done:()=>L.shell.s.fill,
    win:async()=>{const sh=L.shell,g=L.guards[0];sh.close=T;await wait(500);const p=sh.s.fill;sh.s.off=1;L.sockets.splice(L.sockets.indexOf(sh.s),1);
     L.fly.push({n:2,cols:p?p.cols:[HUE.pink,HUE.pink],x0:720,y0:603,x1:g.x,y1:g.gy-6*BS,a0:0,t0:T,dur:.7,arc:160,end(){g.cols=g.cols.concat([HUE.gold,HUE.gold]);g.n=7;g.hit=T;SFX.fuse();burst(g.x,g.gy-6*BS,30,'spark',50,.9)}});if(p)killPiece(p)},
    after:async()=>{await wait(300);setCradle(null);await leave()}},
   GT(6,2,'c4_t3','c4_k3',{walk:14},'x — сколько отрубить')];
  L.drawBack=()=>{const sh=L.shell;if(!sh||!sh.s)return;const x=720,y=603;const cl=sh.close?ease(clamp((T-sh.close)/.35,0,1)):0;const op=sh.close&&T-sh.close>.6?ease(clamp((T-sh.close-.6)/.4,0,1)):0;X.save();X.globalAlpha*=L.gA;
-  // нижняя створка
-  X.fillStyle='#f0a8c0';X.strokeStyle='#5a1a3a';X.lineWidth=4;X.beginPath();X.moveTo(x-110,y-4);X.quadraticCurveTo(x,y+70,x+110,y-4);X.closePath();X.fill();X.stroke();
-  for(let i=-3;i<=3;i++){X.beginPath();X.moveTo(x+i*30,y+(Math.abs(i)<3?28:6));X.lineTo(x+i*8,y+48);X.stroke()}
-  // крышка (открыта, закрывается при решении)
-  const ang=-1.15*(1-cl)-1.3*op;X.translate(x+110,y-4);X.rotate(ang);X.fillStyle='#f6bcd0';X.beginPath();X.moveTo(0,0);X.quadraticCurveTo(-110,-80,-220,0);X.closePath();X.fill();X.stroke();
-  for(let i=1;i<6;i++){X.beginPath();X.moveTo(-110,-10);X.lineTo(-i*37,-6);X.stroke()}X.restore()};
+  // нижняя створка — веер с рёбрышками
+  const fan=(up)=>{X.beginPath();X.moveTo(-120,0);X.bezierCurveTo(-120,up*95,120,up*95,120,0);X.closePath()};
+  X.translate(x,y);X.fillStyle='rgba(10,6,24,.35)';X.beginPath();X.ellipse(0,40,130,14,0,0,7);X.fill();
+  fan(.75);let g=X.createLinearGradient(0,0,0,70);g.addColorStop(0,'#ffd6e4');g.addColorStop(1,'#d9809e');X.fillStyle=g;X.fill();X.strokeStyle='#6a2242';X.lineWidth=4;X.stroke();
+  X.lineWidth=3;X.strokeStyle='rgba(106,34,66,.6)';for(let i=-4;i<=4;i++){X.beginPath();X.moveTo(i*26,4);X.lineTo(i*6,52);X.stroke()}
+  // крышка на петле сзади (открыта, при решении захлопывается)
+  const sy=Math.max(.12,1-cl*.88+op*.88);X.translate(0,-2);X.scale(1,sy);fan(-1.1);g=X.createLinearGradient(0,-70,0,0);g.addColorStop(0,'#ffe8f0');g.addColorStop(1,'#f0a0bc');X.fillStyle=g;X.fill();X.strokeStyle='#6a2242';X.lineWidth=4;X.stroke();
+  X.lineWidth=3;X.strokeStyle='rgba(106,34,66,.5)';for(let i=-4;i<=4;i++){X.beginPath();X.moveTo(i*26,-4);X.lineTo(i*6,-56);X.stroke()}
+  if(sh.close){const k=(T-sh.close)/.8;if(k<1){X.globalCompositeOperation='lighter';X.fillStyle=`rgba(255,240,200,${.6*(1-k)})`;X.beginPath();X.arc(0,0,150,0,7);X.fill()}}
+  X.restore()};
  run(async()=>{await wait(500);await say('c4_s');await say('c4_r');await runTasks();await winLevel()})};
 // ---- глава 5: Погоня на лунном ките ----
 function skyPiece(n,h,y,dx){const v=vis();return newPiece(n,v.x0+v.w+n*BS/2+40+(dx||0),y,{hue:h,vx:-1.2})}

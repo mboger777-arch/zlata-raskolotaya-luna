@@ -3,7 +3,7 @@ import asyncio,sys,json,time,math,os
 from playwright.async_api import async_playwright
 W,H=int(sys.argv[1]),int(sys.argv[2]);OUT=sys.argv[3] if len(sys.argv)>3 else f'/workspace/lesson303/shots/pl_{W}x{H}'
 URL=os.environ.get('URL','http://localhost:8303/index.html')
-LOG=[];FAIL=[];AUDS=[];BS=60
+LOG=[];FAIL=[];AUDS=[];BS=60;FEET=[]
 def log(*a):
   s=' '.join(str(x) for x in a);LOG.append(s);print(s,flush=True)
 async def main():
@@ -13,7 +13,7 @@ async def main():
     pg=await b.new_page(viewport={'width':W,'height':H},has_touch=True,device_scale_factor=2)
     errs=[];pg.on('console',lambda m: errs.append(m.text) if m.type=='error' else None);pg.on('pageerror',lambda e: errs.append(str(e)))
     await pg.goto(URL);await pg.wait_for_timeout(3000)
-    await pg.evaluate("localStorage.clear();0")
+    await pg.evaluate("localStorage.clear();G.feetMon=1;G.feetBad={};0")
     W8=lambda ms: pg.wait_for_timeout(ms);ev=pg.evaluate
     async def st(): return await ev("__T.st()")
     async def shot(n): await pg.screenshot(path=f'{OUT}/{n}.jpg',type='jpeg',quality=72)
@@ -31,7 +31,8 @@ async def main():
         if t['t'].strip().isdigit() and t['css']<14: bad.append(('smalldigit',t['id'],t['t'],round(t['css'],1)))
       for h in a['h']:
         if h.get('ar') and abs(h['w']/h['h']-h['ar'])/h['ar']>.03: bad.append(('stretch',h['n']))
-        if h['feet']<a['vh']*.35 and G_SCENE[0]=='play': bad.append(('float?',h['n'],round(h['feet'])))
+        if h.get('fl')=='BAD': bad.append(('feet-off-ground',h['n'],h.get('sc'),round(h['x']),round(h['feet'])))
+        FEET.append((name,h['n'],h.get('fl')))
       AUDS.append((name,len(a['t']),bad))
       if bad: log('AUDIT',name,bad[:6])
       else: log('audit ok',name,len(a['t']),'texts',len(a['h']),'heroes')
@@ -61,7 +62,8 @@ async def main():
       await pg.mouse.up();await W8(60)
     async def drag(x0,y0,x1,y1,n=22,hold=250,lift=True,ly=None):
       pts=[(x0,y0)]
-      if lift=='always' or (lift and abs(x1-x0)>80):
+      if lift=='down': pts.append((x0,y1))
+      if lift=='always' or (lift is True and abs(x1-x0)>80):
         ly=ly or max(140,min(y0,y1)-110);pts+=[(x0,ly),(x1,ly)]
       pts.append((x1,y1));P=[await C(*q) for q in pts]
       await pg.mouse.move(*P[0]);await pg.mouse.down();await W8(40)
@@ -96,12 +98,12 @@ async def main():
       E=await ev(f"__T.ends({q['id']})");ax,ay,bx,by=E[0]['x'],E[0]['y'],E[1]['x'],E[1]['y'];k=m/n
       px,py=ax+(bx-ax)*k,ay+(by-ay)*k;l=math.hypot(bx-ax,by-ay) or 1;nx,ny=-(by-ay)/l,(bx-ax)/l
       await swipe(px-nx*80,py-ny*80,px+nx*80,py+ny*80)
-    async def drop(n,si=0,dx=0,retry=False):
+    async def drop(n,si=0,dx=0,retry=False,lift=True):
       q=await piece(n)
       if not q and await ev("(()=>{const s=__T.st();return !s.task||s.task.solved||s.scene!=='play'})()"): log('  (already solved)');return
       if not q: log('no piece',n,[(q['n'],round(q['x']),round(q['y']),q['sock']) for q in await pcs()]);FAIL.append(f'no piece {n}');return
       s=(await ev("__T.socks()"))[si];x=(s['x0']+s['x1'])/2+dx;y=s['y']
-      await drag(q['x'],q['y'],x,y)
+      await drag(q['x'],q['y'],x,y,lift=lift)
       if retry:
         await W8(700);q=await piece(n)
         log('  after drop',[(o['n'],round(o['x']),round(o['y']),o['sock'],o['locked']) for o in await pcs()],await ev("__T.socks()"))
@@ -196,44 +198,75 @@ async def main():
       await cut(8,3);await settle(900);await shot('12_c1_cut');await drop(3,0);await settle(400);await drop(5,1);await solved();await shot('13_c1_ok')
       await ready();await shard_try();await settle(600);m=await mist();await drop(2,0,dx=120);await settle(300);await mcheck(m,'2->6 short');await W8(1900)
       await fuse(2,4);await shot('14_c1_fuse');await drop(6,0);await solved()
+      await ready();await settle(900);await shot('15_c1_scale');m=await mist();await drop(2,0);await settle(600);await mcheck(m,'scale 2 short');await shot('16_c1_scale_bad');await W8(1900)
+      await drop(3,0,retry=True);await solved();await W8(400);await shot('17_c1_scale_ok')
       await finish()
     # ---------- Гл.2 мост
     if want('1'):
       await level(1);await settle(800);await shot('20_c2');await audit('c2')
       for k,(bb,need) in enumerate([(8,5),(9,5),(9,7)]):
         if k:await ready()
+        await until("__T.x().walkTo==null",8000)
         if k==1: await shard_try()
-        await settle(700);m=await mist();await drop(bb,0);await settle(900);await mcheck(m,f'whole{bb} on bridge')
+        await settle(700)
+        if k==0: await shot('20b_c2_walk')
+        m=await mist();await drop(bb,0);await settle(900);await mcheck(m,f'whole{bb} on bridge')
         if k==2: await shot('21_c2_bad')
         await settle(1200);await cut(bb,need);await settle(1000);await drop(need,0);await solved()
         if k==0: await W8(250);await shot('22_c2_ok')
       await finish()
-    # ---------- Гл.3 ворота
+    # ---------- Гл.3 ворота: корзинка
+    async def catch_all(timeout=45000):
+      t0=time.time();caught=0
+      while time.time()-t0<timeout/1000:
+        x=await ev("__T.x()")
+        if x is None or x['bk'] is None: return
+        fl=[f for f in x['falling'] if not f['decoy']]
+        dr=await ev("(LV.drop||[]).filter(d=>!d.decoy).length+LV.fly.length")
+        if not fl and not dr:
+          await W8(1500)
+          if await ev("!LV.falling.some(f=>!f.decoy)&&!(LV.drop||[]).some(d=>!d.decoy)&&!LV.fly.length"): return
+          continue
+        if not fl: await W8(150);continue
+        f=fl[0];bk=x['bk'];a=await C(bk['x'],597);await pg.mouse.move(*a);await pg.mouse.down()
+        for _ in range(120):
+          x=await ev("__T.x()");fl2=[g for g in x['falling'] if not g['decoy']]
+          if not fl2 or abs(fl2[0]['x']-f['x'])>5: break
+          tx=fl2[0]['x']
+          # уклоняемся от тёмного осколка, если он прямо над корзинкой и ниже части
+          for d in x['shards']:
+            if abs(d['x']-tx)<150 and d['y']>fl2[0]['y']-40 and d['y']<560: tx=tx+(200 if d['x']<tx else -200)
+          await pg.mouse.move(*(await C(tx,597)));await W8(60)
+        await pg.mouse.up();caught+=1;await W8(200)
+      FAIL.append('catch timeout');log('CATCH TIMEOUT',await ev("__T.x()"))
     if want('2'):
       await level(2);await audit('c3')
-      for k,(ns,tot) in enumerate([([7,2],9),([4,3,2],7),([3,5,4],8)]):
+      for k,(ns,tot) in enumerate([([7,2],9),([4,3],7),([3,5],8)]):
         if k:await ready()
-        await W8(len(ns)*900+1500)
         if k==1: await shard_try()
-        m=await mist();await drop(ns[0],0);await settle(400);await mcheck(m,f'{ns[0]} into key {tot}')
-        if k==1: await shot('30_c3_bad')
+        log('  c3 task',k,await ev('__T.st().cur'));await catch_all();await W8(1200);await settle(500);log('  caught',[(q['n'],round(q['x']),round(q['y']),q['decoy']) for q in await pcs()],await ev('__T.socks()'),await ev('__T.st().cur'))
+        if k==0: await shot('30_c3_caught')
+        m=await mist();await drop(ns[0],0,lift='down');await settle(400);await mcheck(m,f'{ns[0]} into key {tot}')
+        if k==1: await shot('31_c3_bad')
         await W8(1900);await fuse(ns[1],ns[0]);await settle(300)
-        if k==1: await shot('31_c3_fused')
-        await drop(tot,0);await solved()
+        await shot(f'3{k}_pre');log('  pre key',await pcs(),await ev('__T.socks()'));await drop(tot,0,retry=True);await solved()
+        if k==2: await W8(300);await shot('32_c3_gate')
       await finish(timeout=30000)
-    # ---------- Гл.4 стражи
+    # ---------- Гл.4 стражи + ракушка
     if want('3'):
       await level(3);await audit('c4')
       for k,(a,bb) in enumerate([(8,3),(7,5),(6,2)]):
         if k:await ready()
-        if k==1: await shard_try()
+        if k==1:
+          await shard_try();await settle(900);await shot('41b_c4_shell');m=await mist();await drop(1,0);await settle(500);await mcheck(m,'shell 1 short');await W8(1900)
+          await drop(2,0,retry=True);await solved();await W8(900);await shot('42_c4_shell_ok');continue
         m=await mist();await gcut(bb-1);await settle(300);await mcheck(m,f'guard too deep {a}->{bb-1}')
         if k==0: await shot('40_c4_bad')
         await gundo();await settle(500)
         g=(await ev("__T.guards()"))[0];log('  after undo n=',g['n'])
         if g['n']!=a: FAIL.append('guard undo failed')
         await gcut(bb);await solved()
-        if k==0: await W8(200);await shot('41_c4_ok')
+        if k==0: await W8(500);await shot('41_c4_ok')
       await finish()
     # ---------- Гл.5 кит
     if want('4'):
@@ -242,7 +275,15 @@ async def main():
         return await until(f"__T.pieces().some(p=>p.n==={n}&&p.x<vis().x0+vis().w-{n*30+40}&&p.x>vis().x0+{n*30})",15000,80)
       await visible(7);m=await mist();await drop(7,0);await settle(600);await mcheck(m,'whole7 into sky9')
       await shot('50_c5_bad');await W8(800);await visible(7);await cut(7,4);await settle(600);await drop(4,0);await solved()
-      await ready();await shard_try()
+      await until("(()=>{const s=__T.st();return s.cur===1&&!s.talk})()",15000);t0=time.time();sl=0
+      while time.time()-t0<40:
+        if await ev("(()=>{const s=__T.st();return s.cur!==1||!s.task||s.task.solved})()"): break
+        ds=await ev("__T.x().shards.filter(d=>d.x<vis().x0+vis().w-60&&d.x>vis().x0+380)")
+        if ds:
+          d=max(ds,key=lambda d:-d['x']);await swipe(d['x']-30,d['y']-90,d['x']+10,d['y']+90,n=6);sl+=1
+          if sl==2: await shot('50b_c5_slash')
+        else: await W8(80)
+      log('  slashes',sl,await ev("LV.rain"));await ready();await shard_try()
       for n in (4,3,2): await visible(n)
       m=await mist();await drop(2,0);await settle(300);await mcheck(m,'2 into sky7');await W8(1900)
       await visible(4);await visible(3);await fuse(3,4);await shot('51_c5_fuse');await visible(7);await drop(7,0,retry=True);await solved()
@@ -283,7 +324,9 @@ async def main():
         await shot('81_bake_play')
         await until("G.scene==='map'",75000);log('bake best',await ev("SV.best"))
       else: FAIL.append('no bakery (shards<5)')
+    fb=await ev("G.feetBad");log('FEET BAD (frames)',fb)
+    if any(v>3 for v in fb.values()): FAIL.append('feet off ground '+json.dumps(fb,ensure_ascii=False))
     fps=await ev("G.fps()");log('FPS',fps,'ERR',errs[:8]);log('FAILS',FAIL)
-    json.dump({'fps':fps,'errs':errs,'fail':FAIL,'aud':AUDS,'log':LOG},open(f'{OUT}/report.json','w'),ensure_ascii=False,indent=1,default=str)
+    json.dump({'feet':FEET,'fps':fps,'errs':errs,'fail':FAIL,'aud':AUDS,'log':LOG},open(f'{OUT}/report.json','w'),ensure_ascii=False,indent=1,default=str)
     await b.close()
 asyncio.run(main())
