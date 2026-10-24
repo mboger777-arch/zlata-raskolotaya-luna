@@ -187,6 +187,7 @@ LEVELS[2]=()=>{const L=mkLevel(2,{gy:645,zx:150,zh:320,ph:150,grounds:[[-600,190
   if(L.drop&&L.drop.length&&!L.falling.length&&T>L.nextDrop&&!talk){const d=L.drop.shift();const x=rnd(bkMin(),bkMax());const p=newPiece(d.n,x,v.y0-50,{hue:d.h,noGrab:1,noCut:1,phase:1,decoy:d.decoy});p.b.setGravityScale(.22);p.b.setLinearDamping(2);p.b.setAngularVelocity(0);p.b.setFixedRotation(true);p.dd=d;L.falling.push(p);SFX.whoosh()}
   for(const f of L.falling.slice()){if(f.dead){L.falling.splice(L.falling.indexOf(f),1);continue}const q=pos(f);if(f.b)f.b.setAngle(Math.sin(T*2+f.id)*.08);
    if(q.y>mouth-30&&q.y<mouth+25&&Math.abs(q.x-b.x)<b.w/2+12&&!(b.stun>T)){// поймали
+    if(f.decoy){killPiece(f);L.falling.splice(L.falling.indexOf(f),1);SFX.bad();burst(q.x,mouth,26,'spark',290,.8);addShake(.25);b.stun=T+.6;L.nextDrop=T+1.2;continue}
     killPiece(f);L.falling.splice(L.falling.indexOf(f),1);SFX.fuse();burst(q.x,mouth,22,'spark',f.cols[0],.7);b.hop=T;L.act=T;const sx=L.benchX+f.n*BS/2;L.benchX+=f.n*BS+100;
     const cols=f.cols,n=f.n,dec=f.decoy;L.fly.push({n,cols,x0:q.x,y0:mouth,x1:sx,y1:268,t0:T,dur:.55,end(){if(LV===L&&L.task===t){const np=newPiece(n,sx,268,{cols});np.decoy=dec;np.flash=T}}});L.nextDrop=T+.9}
    else if(q.y>mouth+40){killPiece(f);L.falling.splice(L.falling.indexOf(f),1);burst(q.x,q.y,16,'spark',f.cols[0],.5);SFX.bad();if(!f.decoy){L.drop.push(f.dd);hint('c3_miss',8)}L.nextDrop=T+1.4}}
