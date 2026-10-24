@@ -21,6 +21,7 @@ async def main():
     await run_cs("go('cs','intro')","G.scene!=='cs'")
     await pg.wait_for_timeout(2000)
     await ev("go('play',0)");await pg.wait_for_timeout(25000)
+    for i in (1,2,3,4,5,6): await ev(f"go('play',{i})");await pg.wait_for_timeout(22000)
     await run_cs("go('cs','fall')","G.scene!=='cs'")
     await run_cs("go('cs','heart')","G.scene!=='cs'")
     await pg.wait_for_timeout(2000)
