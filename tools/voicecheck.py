@@ -10,21 +10,22 @@ async def main():
     b=await p.chromium.launch(args=['--autoplay-policy=no-user-gesture-required'])
     pg=await b.new_page(viewport={'width':844,'height':390},has_touch=True,is_mobile=True)
     await pg.add_init_script(HOOK)
-    await pg.goto('http://localhost:8417/index.html');await pg.wait_for_timeout(2500)
+    await pg.goto('http://localhost:8303/index.html');await pg.wait_for_timeout(2500)
     ev=pg.evaluate
-    # интро целиком, со звуком; во время реплик жмём по экрану (не должно обрывать)
-    await ev("go('intro')")
-    for i in range(70):
-      await pg.mouse.click(422,200);await pg.wait_for_timeout(1000)
-      if await ev("G.scene")=='map': break
-    print('scene',await ev("G.scene"))
-    await pg.wait_for_timeout(4000)
-    # начало уровня 1 со звуком
+    async def run_cs(start,end_cond,limit=150):
+      await ev(start)
+      for i in range(limit):
+        await pg.mouse.click(422,200);await pg.wait_for_timeout(1000)
+        if await ev(end_cond): break
+      print(start,'->',await ev("G.scene"),flush=True)
+    await run_cs("go('cs','intro')","G.scene!=='cs'")
+    await pg.wait_for_timeout(2000)
     await ev("go('play',0)");await pg.wait_for_timeout(25000)
-    # финал
-    await ev("go('fin')");
-    for i in range(60):
-      await pg.mouse.click(422,200);await pg.wait_for_timeout(1000)
+    await run_cs("go('cs','fall')","G.scene!=='cs'")
+    await run_cs("go('cs','heart')","G.scene!=='cs'")
+    await pg.wait_for_timeout(2000)
+    await run_cs("go('cs','whole')","G.scene!=='cs'")
+    await pg.wait_for_timeout(6000)
     au=[a for a in await ev("__AU") if 'voice' in json.dumps(a) or a['src'].endswith('.mp3')]
     au=[a for a in au if '_' in a['src']]
     cut=[a for a in au if a['cut']];ov=[]

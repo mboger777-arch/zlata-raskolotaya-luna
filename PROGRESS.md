@@ -25,7 +25,8 @@
 - [ ] Реплики → голоса + ASR + проверка ударений
   - [x] tools/lines.py (96 реплик) → tools/lines.json, js/lines.js
   - [x] voicegen.py: REF zlata/pazl/luna/rask/narr, префикс z303; запуск: cd /workspace/lesson303 && nice -n 15 /home/box/tts/qw/bin/python tools/voicegen.py > /tmp/vg303.log (после вырезки!)
-  - [x] генерация 96/96 (VOICEDONE) · [ ] ударения (Злата, Раскол, Пазлик, отсеки, сплавь...) · [ ] voicecheck
+  - [x] генерация 96/96 (VOICEDONE) · [ ] ударения (Злата, Раскол, Пазлик, отсеки, сплавь...) · [x] voicecheck (tools/voicecheck.py: intro/fall/heart/whole + старт ур.1 со звуком, клики во время речи: 26 реплик, CUT 0, OVERLAP 0)
+  - ASR: 96/96, расхождения только цифры/икс и «страш» (норма оглушения); подозрительные: i2 «мечом→мячом», s4/w_4 «сердечко→сердечка» — проверка ударений идёт (запуск: nice -n 15 /home/box/tts/qw/bin/python tools/stress.py scan)
 - [ ] tools/play303.py — полный проход реальными жестами (пишется)
 - [ ] Тесты 844x390, 667x375, 932x430 (ошибка+исправление на каждом задании, аудит, fps, 0 ошибок); voicecheck
 - [ ] Публикация ?v=, проверка живого URL
